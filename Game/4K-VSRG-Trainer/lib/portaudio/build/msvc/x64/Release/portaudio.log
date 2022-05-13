@@ -1,0 +1,36 @@
+﻿  pa_allocation.c
+  pa_converters.c
+  pa_cpuload.c
+  pa_debugprint.c
+  pa_dither.c
+  pa_front.c
+  pa_process.c
+  pa_ringbuffer.c
+  pa_stream.c
+  pa_trace.c
+  pa_win_ds.c
+  pa_win_ds_dynlink.c
+  pa_hostapi_skeleton.c
+  pa_win_wasapi.c
+  pa_win_wdmks.c
+  pa_win_wmme.c
+  pa_win_coinitialize.c
+  pa_win_hostapis.c
+  pa_win_util.c
+  pa_win_waveformat.c
+  正在產生程式碼...
+  正在編譯...
+  pa_win_wdmks_utils.c
+  pa_x86_plain_converters.c
+  正在產生程式碼...
+  asio.cpp
+  asiodrivers.cpp
+  asiolist.cpp
+C:\Users\Test\Desktop\4K-VSRG-Trainer\Game\4K-VSRG-Trainer\lib\portaudio\src\hostapi\asio\ASIOSDK\host\pc\asiolist.cpp(24,41): warning C4267: '引數': 將 'size_t' 轉換為 'DWORD'，資料可能遺失
+C:\Users\Test\Desktop\4K-VSRG-Trainer\Game\4K-VSRG-Trainer\lib\portaudio\src\hostapi\asio\ASIOSDK\host\pc\asiolist.cpp(31,42): warning C4267: '引數': 將 'size_t' 轉換為 'DWORD'，資料可能遺失
+  pa_asio.cpp
+  正在產生程式碼...
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(1371,5): warning MSB8012: TargetPath(C:\Users\Test\Desktop\4K-VSRG-Trainer\Game\4K-VSRG-Trainer\lib\portaudio\build\msvc\x64\Release\portaudio.dll) 與 Linker 的 OutputFile 屬性值 (C:\Users\Test\Desktop\4K-VSRG-Trainer\Game\4K-VSRG-Trainer\lib\portaudio\build\msvc\x64\Release\portaudio_x64.dll) 不相符。這可能會導致您的專案建置不正確。若要改正這種情況，請確認 $(OutDir)、$(TargetName) 和 $(TargetExt) 屬性值必須與 %(Link.OutputFile) 中指定的值相符。
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppBuild.targets(1373,5): warning MSB8012: TargetName(portaudio) 與 Linker 的 OutputFile 屬性值 (portaudio_x64) 不相符。這可能會導致您的專案建置不正確。若要改正這種情況，請確認 $(OutDir)、$(TargetName) 和 $(TargetExt) 屬性值必須與 %(Link.OutputFile) 中指定的值相符。
+     正在建立程式庫 x64\Release/portaudio_x64.lib 和物件 x64\Release/portaudio_x64.exp
+  portaudio.vcxproj -> C:\Users\Test\Desktop\4K-VSRG-Trainer\Game\4K-VSRG-Trainer\lib\portaudio\build\msvc\x64\Release\portaudio.dll

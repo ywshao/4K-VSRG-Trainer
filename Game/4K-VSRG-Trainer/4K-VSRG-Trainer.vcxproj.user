@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;$(ProjectDir)lib\SDL2-2.0.22\lib\x64;$(ProjectDir)lib\SDL_gpu-0.12.0\lib\Release;$(ProjectDir)lib\SDL2_mixer-2.0.4\lib\x64</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerEnvironment>PATH=%PATH%;$(ProjectDir)lib\SDL2-2.0.22\lib\x64;$(ProjectDir)lib\SDL_gpu-0.12.0\lib\Release;$(ProjectDir)lib\SDL2_mixer-2.0.4\lib\x64</LocalDebuggerEnvironment>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+</Project>
