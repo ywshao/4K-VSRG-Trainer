@@ -18,12 +18,6 @@
     <ClCompile Include="src\main.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
-    <ClCompile Include="lib\nfont-master\NFont\NFont.cpp">
-      <Filter>來源檔案</Filter>
-    </ClCompile>
-    <ClCompile Include="lib\nfont-master\SDL_FontCache\SDL_FontCache.c">
-      <Filter>來源檔案</Filter>
-    </ClCompile>
     <ClCompile Include="src\audioTest.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
@@ -34,6 +28,15 @@
       <Filter>來源檔案</Filter>
     </ClCompile>
     <ClCompile Include="src\note.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\nfont-master\NFont\NFont.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="..\lib\nfont-master\SDL_FontCache\SDL_FontCache.c">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
+    <ClCompile Include="src\score.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
   </ItemGroup>
@@ -48,6 +51,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="include\note.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="include\score.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

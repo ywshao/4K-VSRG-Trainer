@@ -32,6 +32,8 @@
 *.app
 
 # Visual Studio
-Game/4K-VSRG-Trainer/.vs/
+*/*/.vs/
+Game/4K-VSRG-Trainer/sound_test
 Game/4K-VSRG-Trainer/x64/
-Game/4K-VSRG-Trainer/sound_test/
+Game/Audio-Device-Detector/x64
+BMS/BMS-Parser/x64

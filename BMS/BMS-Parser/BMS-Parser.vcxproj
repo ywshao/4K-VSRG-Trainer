@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{64b387ed-c4fd-4f6e-a49d-52f6389944b6}</ProjectGuid>
-    <RootNamespace>My4KVSRGTrainer</RootNamespace>
+    <ProjectGuid>{5632df7c-2fd9-4af6-9cb6-ccf9ba9ac5ed}</ProjectGuid>
+    <RootNamespace>BMSParser</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,21 +70,11 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LinkIncremental>true</LinkIncremental>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <LinkIncremental>false</LinkIncremental>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\lib\SDL2-2.0.22\include;$(ProjectDir)..\lib\SDL_gpu-0.12.0\include;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\include;$(ProjectDir)..\lib\portaudio\include;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\include;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\include;$(ProjectDir)..\lib\mINI-0.9.13\src;$(ProjectDir)include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\SDL2-2.0.22\lib\x64;$(ProjectDir)..\lib\SDL_gpu-0.12.0\lib\Release;$(ProjectDir)..\lib\portaudio\lib;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\lib\x64;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\lib\SDL2-2.0.22\include;$(ProjectDir)..\lib\SDL_gpu-0.12.0\include;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\include;$(ProjectDir)..\lib\portaudio\include;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\include;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\include;$(ProjectDir)..\lib\mINI-0.9.13\src;$(ProjectDir)include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\SDL2-2.0.22\lib\x64;$(ProjectDir)..\lib\SDL_gpu-0.12.0\lib\Release;$(ProjectDir)..\lib\portaudio\lib;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\lib\x64;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -118,14 +108,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;FC_USE_SDL_GPU;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_gpu.lib;portaudio_x64.lib;SDL2_ttf.lib;sndfile.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,34 +122,21 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;FC_USE_SDL_GPU;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_gpu.lib;portaudio_x64.lib;SDL2_ttf.lib;sndfile.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\lib\nfont-master\NFont\NFont.cpp" />
-    <ClCompile Include="..\lib\nfont-master\SDL_FontCache\SDL_FontCache.c" />
-    <ClCompile Include="src\audioTest.cpp" />
-    <ClCompile Include="src\game.cpp" />
-    <ClCompile Include="src\graphic.cpp" />
-    <ClCompile Include="src\score.cpp" />
-    <ClCompile Include="src\note.cpp" />
-    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\bmsParser.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\audioTest.h" />
-    <ClInclude Include="include\game.h" />
-    <ClInclude Include="include\graphic.h" />
-    <ClInclude Include="include\score.h" />
-    <ClInclude Include="include\note.h" />
+    <ClInclude Include="include\bmsParser.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

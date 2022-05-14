@@ -5,6 +5,8 @@
 #include <vector>
 #include <list>
 
+#define maxSound 2000
+
 class Audio {
 private:
 	struct Sound {
@@ -27,7 +29,7 @@ private:
 	PaStream* stream;
 	const int framesPerBuffer = 256;
 	std::list<PlayingSound> playingSounds;
-	Sound sound[100];	// Test temp
+	Sound sound[maxSound];	// Test temp
 public:
 	void portAudioInit(PaDeviceIndex device);
 	void portAudioExit();

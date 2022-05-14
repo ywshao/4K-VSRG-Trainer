@@ -10,6 +10,7 @@
 #include "graphic.h"
 #include "audioTest.h"
 #include "note.h"
+#include "score.h"
 
 class Fps {
 private:
@@ -27,10 +28,17 @@ class Game {
 private:
 	Graphic graphic;
 	Audio audio;
-	KeyLogger keyLogger;
+	JudgeKey judgeKey;
+	JudgeVisible judgeKeyVisible;
+	JudgeVisible judgeNoteVisible;
+	Chart chart;
+	ChartVisible chartVisible;
+	Score score;
+	ErrorMeter errorMeter;
 	Fps fps;
 	SDL_Scancode keyMap[4] = {};
 	bool keyPressed[4] = {};
+	double scrollSpeed;
 	
 public:
 	void init();
