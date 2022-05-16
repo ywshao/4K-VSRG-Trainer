@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <iterator>
+#include <cstring>
 #include "audioTest.h"
 
 int Audio::callback(const void* inputBuffer,
@@ -18,8 +19,8 @@ int Audio::callback(const void* inputBuffer,
 	for (std::list<PlayingSound>::iterator it = playingSounds->begin(); it != playingSounds->end(); it++) {
 		float* output = (float*)outputBuffer;
 		for (int times = 0; times < framesPerBuffer; times++) {
-			*output++ += it->sound->left[it->playing_pos];
-			*output++ += it->sound->right[it->playing_pos];
+			*output++ += it->sound->left[it->playing_pos] * soundVolume;
+			*output++ += it->sound->right[it->playing_pos] * soundVolume;
 			if (++(it->playing_pos) >= it->sound->left.size()) {
 				std::list<PlayingSound>::iterator eraseIt = it++;
 				playingSounds->erase(eraseIt);
@@ -35,17 +36,12 @@ int Audio::callback(const void* inputBuffer,
 
 void Audio::portAudioInit(PaDeviceIndex deviceIndex) {
 	PaError err = Pa_Initialize();
-	printf("Super duper test\n");
+	//printf("Super duper test\n");
 	if (err != paNoError)
 		printf("PortAudio error: %s\n", Pa_GetErrorText(err));
 	std::vector<const PaDeviceInfo*> device;
 	for (int a = 0; a < Pa_GetDeviceCount(); a++) {
 		device.push_back(Pa_GetDeviceInfo(a));
-		if (device[a]->maxOutputChannels) {
-			printf("%s\n", device[a]->name);
-			printf("%d\n", device[a]->maxInputChannels);
-			printf("%d\n", device[a]->maxOutputChannels);
-		}
 	}
 	static PaStreamParameters outputParameters = {
 		deviceIndex, // device
@@ -61,7 +57,7 @@ void Audio::portAudioInit(PaDeviceIndex deviceIndex) {
 
 void Audio::portAudioExit() {
 	PaError err = Pa_Terminate();
-	printf("Super duper test\n");
+	//printf("Super duper test\n");
 	if (err != paNoError)
 		printf("PortAudio error: %s\n", Pa_GetErrorText(err));
 }
@@ -73,17 +69,36 @@ void Audio::playSound(int index) {
 void Audio::loadSound(int index, const char* path) {
 	SF_INFO sfInfo;
 	SNDFILE* sndFile = sf_open(path, SFM_READ, &sfInfo);
-	printf("Channels: %d\n", sfInfo.channels);
-	printf("Smaple rate: %d\n", sfInfo.samplerate);
-	printf("Format: %x\n", sfInfo.format);
-	printf("%x\n", SF_FORMAT_FLOAT);
-	printf("%x\n", SF_FORMAT_DOUBLE);
+	//printf("Channels: %d\n", sfInfo.channels);
+	//printf("Smaple rate: %d\n", sfInfo.samplerate);
+	if (!sndFile) {
+		char* newPath = _strdup(path);
+		newPath[strlen(newPath) - 3] = 'o';
+		newPath[strlen(newPath) - 2] = 'g';
+		newPath[strlen(newPath) - 1] = 'g';
+		sndFile = sf_open(newPath, SFM_READ, &sfInfo);
+	}
+	//printf("Format: %x\n", sfInfo.format);
+	//printf("%x\n", SF_FORMAT_FLOAT);
+	//printf("%x\n", SF_FORMAT_DOUBLE);
 	if (sfInfo.format & SF_FORMAT_FLOAT || sfInfo.format & SF_FORMAT_DOUBLE) {
-		printf("Is float!\n");
+		//printf("It's float!\n");
 		sf_count_t count = 0;
 		const int MAX_LEN = 256;
 		float readData[MAX_LEN];
 		while (count = sf_read_float(sndFile, readData, MAX_LEN)) {
+			for (int idx = 0; idx < count;) {
+				sound[index].left.push_back(readData[idx++]);
+				sound[index].right.push_back(readData[idx++]);
+			}
+		}
+	}
+	else if (sfInfo.format & SF_FORMAT_OGG && (sfInfo.format % 0x10000) & SF_FORMAT_VORBIS) {
+		//printf("It's OGG!\n");
+		sf_count_t count = 0;
+		const int MAX_LEN = 256;
+		double readData[MAX_LEN];
+		while (count = sf_read_double(sndFile, readData, MAX_LEN)) {
 			for (int idx = 0; idx < count;) {
 				sound[index].left.push_back(readData[idx++]);
 				sound[index].right.push_back(readData[idx++]);

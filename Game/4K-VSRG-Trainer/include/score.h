@@ -2,7 +2,11 @@
 
 #include "note.h"
 
-#define missMs 500
+// Early than this will not count
+#define earlyMissMs 500
+// Early than this will be counted
+// Later than this will clear the note and be counted as miss
+#define lateMissMs 200
 
 struct JudgeErrorTime {
 	Uint64 time;
@@ -38,5 +42,5 @@ private:
 	double score;
 public:
 	JudgeKeySound judger(double difficulty, int key, ChartVisible &chartVisible, JudgeVisible& judgeNoteVisible, ErrorMeter& errorMeter);
-	void missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible);
+	bool missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible);
 };

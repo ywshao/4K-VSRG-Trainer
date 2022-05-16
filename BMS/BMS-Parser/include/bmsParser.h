@@ -1,8 +1,11 @@
 #pragma once
 
 #define bufferSize 1000
+#define maxIndex 1536
+#define maxBarNum 1000
+#define maxKeyNum 8
+
 #include <cstdlib>
-#include <cstdio>
 #include <fstream>
 #include <vector>
 #include <list>
@@ -12,14 +15,16 @@ class BmsParser {
 private:
 	FILE* fp;
 	char buffer[bufferSize];
-	int player;
-	float bpm;
-	float bpmFloat[1536];
-	std::string wav[1536] = {};
-	std::list<float> timeSignature;
-	std::vector<int> note[1000][8];
 	int convert36baseToInt(std::string wavNum);
 	std::vector<int> messageToNotes(std::string message);
 public:
+	int player;
+	float bpm;
+	float bpmFloat[maxIndex];
+	int barMax;
+	std::string wav[maxIndex] = {};
+	std::list<float> timeSignature;
+	std::vector<std::vector<int>> bgm[maxBarNum];
+	std::vector<int> note[maxBarNum][maxKeyNum];
 	void parseFile(const char* file);
 };

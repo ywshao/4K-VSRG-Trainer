@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 
+#define soundVolume 0.2
 #define maxSound 2000
 
 class Audio {

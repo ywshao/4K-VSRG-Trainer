@@ -9,6 +9,7 @@
 #include <cstdio>
 #include "graphic.h"
 #include "audioTest.h"
+#include "bmsParser.h"
 #include "note.h"
 #include "score.h"
 
@@ -28,6 +29,7 @@ class Game {
 private:
 	Graphic graphic;
 	Audio audio;
+	BmsParser bmsParser;
 	JudgeKey judgeKey;
 	JudgeVisible judgeKeyVisible;
 	JudgeVisible judgeNoteVisible;

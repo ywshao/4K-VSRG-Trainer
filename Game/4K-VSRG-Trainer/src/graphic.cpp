@@ -8,6 +8,8 @@ void Graphic::init(std::string texturePath, mINI::INIStructure& iniTexture) {
 	TTF_Init();
 	font[FONT_REGULAR] = TTF_OpenFont("texture/Roboto-Regular.ttf", 40);
 	nfont[FONT_REGULAR].load(font[FONT_REGULAR]);
+	font[FONT_DEBUG] = TTF_OpenFont("texture/Roboto-Regular.ttf", 30);
+	nfont[FONT_DEBUG].load(font[FONT_DEBUG]);
 	font[FONT_JUDGE] = TTF_OpenFont("texture/BebasNeue-Regular.ttf", 80);
 	nfont[FONT_JUDGE].load(font[FONT_JUDGE]);
 	// Load images
@@ -64,8 +66,8 @@ void Graphic::drawNote(std::list<KeySound>::iterator begin[4], std::list<KeySoun
 	//GPU_Blit(note[1], NULL, window, 200, 200);
 	for (int key = 0; key < 4; key++) {
 		for (std::list<KeySound>::iterator iter = begin[key]; iter != end[key]; iter++) {
-			//GPU_Blit(note[key], NULL, window, 200 + key * 100, (SDL_GetTicks64() - iter->time) * scrollSpeed + receipterY);
-			GPU_Blit(note[key], NULL, window, 200 + key * 100, (int)(SDL_GetTicks64() - iter->time) * scrollSpeed + receipterY);
+			//GPU_Blit(note[key], NULL, window, 300 + key * 100, (SDL_GetTicks64() - iter->time) * scrollSpeed + receipterY);
+			GPU_Blit(note[key], NULL, window, 300 + key * 100, (int)(SDL_GetTicks64() - iter->time) * scrollSpeed + receipterY);
 		}
 	}
 	/*
@@ -80,16 +82,16 @@ void Graphic::drawNote(std::list<KeySound>::iterator begin[4], std::list<KeySoun
 }
 
 void Graphic::drawReceipter() {
-	GPU_Blit(receipter[0], NULL, window, 200, receipterY);
-	GPU_Blit(receipter[1], NULL, window, 300, receipterY);
-	GPU_Blit(receipter[2], NULL, window, 400, receipterY);
-	GPU_Blit(receipter[3], NULL, window, 500, receipterY);
+	GPU_Blit(receipter[0], NULL, window, 300, receipterY);
+	GPU_Blit(receipter[1], NULL, window, 400, receipterY);
+	GPU_Blit(receipter[2], NULL, window, 500, receipterY);
+	GPU_Blit(receipter[3], NULL, window, 600, receipterY);
 }
 
 void Graphic::drawKeyPressed(bool keyPressed[4]) {
 	for (int key = 0; key < 4; key++) {
 		if (keyPressed[key]) {
-			GPU_Blit(pressed[key], NULL, window, 200 + key * 100, receipterY);
+			GPU_Blit(pressed[key], NULL, window, 300 + key * 100, receipterY);
 		}
 	}
 }
@@ -98,7 +100,7 @@ void Graphic::drawJudgeNote(std::list<JudgeKeySound>::iterator begin[4], std::li
 	for (int key = 0; key < 4; key++) {
 		std::list<JudgeKeySound>::iterator iter = begin[key];
 		for (; iter != end[key]; iter++) {
-			GPU_Blit(judgeNote[iter->judge], NULL, window, 700 + key * 100, SDL_GetTicks64() - iter->time);
+			GPU_Blit(judgeNote[iter->judge], NULL, window, 800 + key * 100, SDL_GetTicks64() - iter->time);
 		}
 	}
 }
@@ -107,7 +109,7 @@ void Graphic::drawJudgeKey(std::list<JudgeKeySound>::iterator begin[4], std::lis
 	for (int key = 0; key < 4; key++) {
 		std::list<JudgeKeySound>::iterator iter = begin[key];
 		for (; iter != end[key]; iter++) {
-			GPU_Blit(judgeKey[iter->judge], NULL, window, 700 + key * 100, SDL_GetTicks64() - iter->time);
+			GPU_Blit(judgeKey[iter->judge], NULL, window, 800 + key * 100, SDL_GetTicks64() - iter->time);
 		}
 	}
 }
@@ -117,41 +119,41 @@ void Graphic::drawJudge(int judge) {
 	staticJudge = judge != 6 ? judge : staticJudge;
 	switch (staticJudge) {
 	case 0:
-		nfont[FONT_JUDGE].draw(window, 200, 200, SDL_Color{ 0, 255, 255, 255 }, "MARVELOUS");
+		nfont[FONT_JUDGE].draw(window, 300, 100, SDL_Color{ 0, 255, 255, 255 }, "MARVELOUS");
 		break;
 	case 1:
-		nfont[FONT_JUDGE].draw(window, 200, 200, SDL_Color{ 255, 255, 0, 255 }, "PERFECT");
+		nfont[FONT_JUDGE].draw(window, 330, 100, SDL_Color{ 255, 255, 0, 255 }, "PERFECT");
 		break;
 	case 2:
-		nfont[FONT_JUDGE].draw(window, 200, 200, SDL_Color{ 0, 255, 0, 255 }, "GREAT");
+		nfont[FONT_JUDGE].draw(window, 360, 100, SDL_Color{ 0, 255, 0, 255 }, "GREAT");
 		break;
 	case 3:
-		nfont[FONT_JUDGE].draw(window, 200, 200, SDL_Color{ 0, 0, 255, 255 }, "GOOD");
+		nfont[FONT_JUDGE].draw(window, 375, 100, SDL_Color{ 0, 0, 255, 255 }, "GOOD");
 		break;
 	case 4:
-		nfont[FONT_JUDGE].draw(window, 200, 200, SDL_Color{ 255, 0, 255, 255 }, "BAD");
+		nfont[FONT_JUDGE].draw(window, 390, 100, SDL_Color{ 255, 0, 255, 255 }, "BAD");
 		break;
 	case 5:
-		nfont[FONT_JUDGE].draw(window, 200, 200, SDL_Color{ 255, 0, 0, 255 }, "MISS");
+		nfont[FONT_JUDGE].draw(window, 375, 100, SDL_Color{ 255, 0, 0, 255 }, "MISS");
 		break;
 	}
 }
 
 void Graphic::drawErrorMeter(std::list<JudgeErrorTime>::iterator begin, std::list<JudgeErrorTime>::iterator end, int lifeTime, float scale) {
-	GPU_Blit(errorMeterMiddle, NULL, window, 350, 300);
+	GPU_Blit(errorMeterMiddle, NULL, window, 450, 200);
 	for (std::list<JudgeErrorTime>::iterator iter = begin; iter != end; iter++) {
 		int alpha = 255 - (float)255 * (SDL_GetTicks64() - iter->time) / lifeTime;
 		GPU_SetRGBA(errorMeter[iter->judge], 255, 255, 255, alpha >= 0 ? alpha : 0);
-		GPU_Blit(errorMeter[iter->judge], NULL, window, 350 + iter->error * scale, 300);
+		GPU_Blit(errorMeter[iter->judge], NULL, window, 450 + iter->error * scale, 200);
 	}
 }
 
 void Graphic::drawText() {
-	nfont[FONT_REGULAR].draw(window, 600, 300, SDL_Color{ 255, 255, 255, 255 }, "Sound sample taken from:\nDefeat awaken battle ship\nArtist: Sakamiya\n\nPure Ruby\nArtist: SHIKI\nRIP");
+	nfont[FONT_REGULAR].draw(window, 700, 300, SDL_Color{ 255, 255, 255, 255 }, "Sound sample taken from:\nDefeat awaken battle ship\nArtist: Sakamiya");
 }
 
 void Graphic::drawDebug(char* debugText[]) {
 	for (int index = 0; debugText[index]; index++) {
-		nfont[FONT_REGULAR].draw(window, 10, index * 50, SDL_Color{ 255, 255, 255, 255 }, debugText[index]);
+		nfont[FONT_DEBUG].draw(window, 10, index * 40, SDL_Color{ 255, 255, 255, 255 }, debugText[index]);
 	}
 }

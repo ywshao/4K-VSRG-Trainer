@@ -13,7 +13,7 @@ void Game::init() {
 	graphic.init(textPath, iniTexture);
 	// Audio init
 	audio.portAudioInit(std::stoi(iniGlobal["Audio"]["device"]));
-
+	/*
 	audio.loadSound(0, "sound_test/A_003.wav");	// Test
 	audio.loadSound(1, "sound_test/C_003.wav");	// Test
 	audio.loadSound(2, "sound_test/F.wav");	// Test
@@ -45,7 +45,7 @@ void Game::init() {
 	audio.loadSound(0x6a, "sound_test/pi5f.wav");	// Test
 	audio.loadSound(0x6b, "sound_test/pi5g.wav");	// Test
 	audio.loadSound(0x6c, "sound_test/pi5a.wav");	// Test
-	audio.loadSound(0x9e, "sound_test/bpi3.wav");	// Test
+	audio.loadSound(0x9e, "sound_test/bpi3.wav");	// Test*/
 	// Key map init
 	keyMap[0] = SDL_SCANCODE_X;
 	keyMap[1] = SDL_SCANCODE_C;
@@ -58,7 +58,7 @@ void Game::init() {
 	errorMeter.setScale(stof(iniGlobal["ErrorMeter"]["scale"]));
 	scrollSpeed = stof(iniGlobal["ScrollSpeed"]["speed"]);
 	// Test
-	Uint64 offset = 6000;							// Test
+	/*Uint64 offset = 6000;							// Test
 	for (Uint64 a = 0, b = 2, c = 3; a < 32; a += 4, b += 4, c += 4) {		// Test
 		chart.add(0, { a * 100 + offset, 0 });		// Test
 		chart.add(3, { b * 100 + offset, 2 });		// Test
@@ -247,8 +247,44 @@ void Game::init() {
 		chartVisible.add(1, { offset += dist, 0x5d });	// Test
 		chartVisible.add(3, { offset += dist, 0x60 });	// Test
 	}
-	chartVisible.add(2, { offset += dist, 0x9e });		// Test
-
+	chartVisible.add(2, { offset += dist, 0x9e });		// Test*/
+	bmsParser.parseFile("sound_test/[—L‰êàY]Defeatawakenbattleship/SPI.bms");
+	double offset = 14000;
+	for (int bar = 0; bar <= bmsParser.barMax; bar++) {
+		double barLength = (double)4 / bmsParser.bpm * 60000;
+		for (int key = 0; key < 8; key++) {
+			int sizeNote = bmsParser.note[bar][key].size();
+			double keyLength = barLength / sizeNote;
+			double keyOffset = offset;
+			for (int note = 0; note < sizeNote; note++) {
+				if (bmsParser.note[bar][key][note]) {
+					chartVisible.add(key < 4 ? key : 4, { (Uint64)keyOffset, bmsParser.note[bar][key][note] });
+				}
+				keyOffset += keyLength;
+			}
+		}
+		int sizeIdx = bmsParser.bgm[bar].size();
+		for (int idx = 0; idx < sizeIdx; idx++) {
+			int sizeBgm = bmsParser.bgm[bar][idx].size();
+			double keyLength = barLength / sizeBgm;
+			double keyOffset = offset;
+			for (int bgm = 0; bgm < sizeBgm; bgm++) {
+				if (bmsParser.bgm[bar][idx][bgm]) {
+					chartVisible.add(4, { (Uint64)keyOffset, bmsParser.bgm[bar][idx][bgm] });
+				}
+				keyOffset += keyLength;
+			}
+		}
+		offset += barLength;
+	}
+	for (int wav = 0; wav < 1536; wav++) {
+		if (!bmsParser.wav[wav].empty()) {
+			char fileName[100] = "sound_test/[—L‰êàY]Defeatawakenbattleship/";
+			strcat(fileName, bmsParser.wav[wav].c_str());
+			audio.loadSound(wav, fileName);
+			//printf("%s\n", fileName);
+		}
+	}
 }
 
 void Game::exit() {
@@ -259,16 +295,21 @@ void Game::exit() {
 void Game::update() {
 	graphic.clear();
 
-	score.missJudger(1/*Test*/, chartVisible, judgeNoteVisible);
 	// Key
 	static JudgeKeySound judgeKeySound({ 0, 0 }, 6);
+	if (score.missJudger(1/*Test*/, chartVisible, judgeNoteVisible)) {
+		judgeKeySound.judge = 5;
+	}
 	const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
 	for (int key = 0; key < 4; key++) {
 		if (keyboardState[keyMap[key]]) {
 			if (!keyPressed[key]) {
 				judgeKeySound = score.judger(1/*Test*/, key, chartVisible, judgeNoteVisible, errorMeter);
-				audio.playSound(judgeKeySound.sound);
+				if (judgeKeySound.sound) {
+					audio.playSound(judgeKeySound.sound);
+				}
 				judgeKeyVisible.add(key, judgeKeySound);
+				judgeKey.add(key, judgeKeySound);
 				keyPressed[key] = true;
 			}
 		}
@@ -278,7 +319,7 @@ void Game::update() {
 	}
 	judgeNoteVisible.update();
 	judgeKeyVisible.update();
-	chartVisible.update();
+	chartVisible.update(&audio);
 	errorMeter.update();
 
 	graphic.drawReceipter();

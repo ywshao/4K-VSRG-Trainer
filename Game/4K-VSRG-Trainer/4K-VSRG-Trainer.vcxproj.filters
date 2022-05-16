@@ -39,6 +39,9 @@
     <ClCompile Include="src\score.cpp">
       <Filter>來源檔案</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\BMS\BMS-Parser\src\bmsParser.cpp">
+      <Filter>來源檔案</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\audioTest.h">
@@ -54,6 +57,9 @@
       <Filter>標頭檔</Filter>
     </ClInclude>
     <ClInclude Include="include\score.h">
+      <Filter>標頭檔</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\BMS\BMS-Parser\include\bmsParser.h">
       <Filter>標頭檔</Filter>
     </ClInclude>
   </ItemGroup>

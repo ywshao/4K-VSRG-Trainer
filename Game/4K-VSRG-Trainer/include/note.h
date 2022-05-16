@@ -2,6 +2,7 @@
 
 #include <SDL.h>
 #include <list>
+#include "audioTest.h"
 
 struct KeySound {
 	Uint64 time;
@@ -17,12 +18,12 @@ struct JudgeKeySound : KeySound {
 	int judge;
 };
 
-template <typename T>
+template <typename T, int size>
 class KeyLogger {
 protected:
-	typename std::list<T> keyLog[4];
-	typename std::list<T>::iterator keyBegin[4];
-	typename std::list<T>::iterator keyEnd[4];
+	typename std::list<T> keyLog[size];
+	typename std::list<T>::iterator keyBegin[size];
+	typename std::list<T>::iterator keyEnd[size];
 public:
 	void clear();
 	void add(int key, T data);
@@ -35,29 +36,29 @@ public:
 	typename std::list<T>::iterator end(int key);
 };
 
-class JudgeKey : public KeyLogger<JudgeKeySound> {
+class JudgeKey : public KeyLogger<JudgeKeySound, 4> {
 private:
 	Uint64 offset = 0;
 public:
 };
 
-class JudgeVisible : public KeyLogger<JudgeKeySound> {
+class JudgeVisible : public KeyLogger<JudgeKeySound, 4> {
 public:
 	void update();
 };
 
-class Chart : public KeyLogger<KeySound> {
+class Chart : public KeyLogger<KeySound, 4> {
 private:
 public:
 };
 
-class ChartVisible : public KeyLogger<KeySound> {
+class ChartVisible : public KeyLogger<KeySound, 5> {
 private:
 public:
-	void update();
+	void update(Audio* audio);
 };
 
-class NoteLogger : public KeyLogger<Uint64> {
+class NoteLogger : public KeyLogger<Uint64, 4> {
 private:
 public:
 };

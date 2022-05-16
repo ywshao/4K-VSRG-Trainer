@@ -98,7 +98,7 @@ int Score::judge(double difficulty, Uint64 errorMs) {
 	else if (errorAbs <= 180) {
 		return 4;
 	}
-	else if (errorAbs <= missMs) {
+	else if (errorAbs <= earlyMissMs) {
 		return 5;
 	}
 	else {
@@ -110,62 +110,85 @@ JudgeKeySound Score::judger(double difficulty, int key, ChartVisible& chartVisib
 	Uint64 errorMs;
 	bool early;
 	bool checkNextJudge = false;
-	int judgeResult = 6;
-	JudgeKeySound judgeKeySound;
+	int judgeResult = 6; // Default judge
+	static JudgeKeySound judgeKeySound[4]; // Preserve the last note sound
 	std::list<KeySound>::iterator judgeNote;
 	static KeySound lastNote[4]; // Preserve the last note sound
+	for (int k = 0; k < 4; k++) {
+		judgeKeySound[k].judge = 6; // Default judge
+	}
 	for (std::list<KeySound>::iterator iter = judgeNote = chartVisible.begin(key); iter != chartVisible.end(key); iter++) {
 		early = SDL_GetTicks64() < iter->time;
 		errorMs = early ? iter->time - SDL_GetTicks64() : SDL_GetTicks64() - iter->time;
 		judgeResult = judge(difficulty, errorMs);
 		if (judgeResult <= 3) { // Judge window overlap
-			judgeKeySound = { *iter,  judgeResult };
-			judgeNoteVisible.add(key, judgeKeySound);
+			judgeKeySound[key] = {*iter,  judgeResult};
+			judgeNoteVisible.add(key, judgeKeySound[key]);
 			chartVisible.remove(key, iter);
-			judgeKeySound.time = SDL_GetTicks64();
+			judgeKeySound[key].time = SDL_GetTicks64();
 			errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
-			return judgeKeySound;
+			return judgeKeySound[key];
 		}
-		else if (judgeResult > 3 && judgeResult <= 5 && !early) {
-			judgeNote = iter;
-			checkNextJudge = true;
+		else if (judgeResult > 3 && judgeResult <= 5) {
+			if (!early) {
+				judgeNote = iter;
+				checkNextJudge = true;
+			}
+			else if (judgeResult == 4) {
+				judgeKeySound[key] = { *iter,  judgeResult };
+				judgeNoteVisible.add(key, judgeKeySound[key]);
+				chartVisible.remove(key, iter);
+				judgeKeySound[key].time = SDL_GetTicks64();
+				errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
+				return judgeKeySound[key];
+			}
+			else if (judgeResult == 5) {
+				judgeKeySound[key] = { *iter,  judgeResult };
+				judgeNoteVisible.add(key, judgeKeySound[key]);
+				judgeKeySound[key].time = SDL_GetTicks64();
+				errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
+				return judgeKeySound[key];
+			}
 		}
 		lastNote[key] = *iter;
 	}
 	// Does not have judge window overlap
 	if (checkNextJudge) { // Return judge 3~5
-		judgeKeySound = { *judgeNote,  judgeResult };
+		judgeKeySound[key] = { *judgeNote,  judgeResult };
 		judgeNoteVisible.add(key, { *judgeNote,  judgeResult });
 		chartVisible.remove(key, judgeNote);
-		judgeKeySound.time = SDL_GetTicks64();
+		judgeKeySound[key].time = SDL_GetTicks64();
 		errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
-		return judgeKeySound;
+		return judgeKeySound[key];
 	}
 	else { // Return judge 0~2
 		if (judgeResult != 6) {
-			judgeKeySound = { lastNote[key], judgeResult };
-			judgeKeySound.time = SDL_GetTicks64();
+			judgeKeySound[key] = { lastNote[key], judgeResult };
+			judgeKeySound[key].time = SDL_GetTicks64();
 			errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
-			return judgeKeySound;
+			return judgeKeySound[key];
 		}
 		else { // Not in any judge window
-			judgeKeySound = { lastNote[key], 6 };
-			judgeKeySound.time = SDL_GetTicks64();
-			return judgeKeySound;
+			//judgeKeySound = { lastNote[key], 6 };
+			judgeKeySound[key].time = SDL_GetTicks64();
+			return judgeKeySound[key];
 		}
 	}
 }
 
-void Score::missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible) {
+bool Score::missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible) {
+	bool flag = false;
 	for (int key = 0; key < 4; key++) {
 		for (std::list<KeySound>::iterator iter = chartVisible.begin(key); iter != chartVisible.end(key);) {
-			if (SDL_GetTicks64() >= iter->time + missMs) {
+			if (SDL_GetTicks64() >= iter->time + lateMissMs) {
 				judgeNoteVisible.add(key, { *iter,  5 });
 				iter = chartVisible.remove(key, iter);
+				flag = true;
 			}
 			else {
 				iter++;
 			}
 		}
 	}
+	return flag;
 }

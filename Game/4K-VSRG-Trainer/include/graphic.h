@@ -9,17 +9,19 @@
 #include "score.h"
 
 #define receipterY 600
+#define fontNum 3
 
 enum {
 	FONT_REGULAR = 0,
+	FONT_DEBUG,
 	FONT_JUDGE
 };
 
 class Graphic {
 private:
 	GPU_Target* window;
-	TTF_Font* font[2];
-	NFont nfont[2];
+	TTF_Font* font[fontNum];
+	NFont nfont[fontNum];
 	GPU_Image* note[4];
 	GPU_Image* receipter[4];
 	GPU_Image* pressed[4];
