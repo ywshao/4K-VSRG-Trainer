@@ -30,6 +30,7 @@ private:
 	Graphic graphic;
 	Audio audio;
 	BmsParser bmsParser;
+	Uint64 chartOffset;
 	JudgeKey judgeKey;
 	JudgeVisible judgeKeyVisible;
 	JudgeVisible judgeNoteVisible;

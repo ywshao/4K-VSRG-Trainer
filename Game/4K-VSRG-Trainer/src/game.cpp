@@ -58,207 +58,24 @@ void Game::init() {
 	errorMeter.setScale(stof(iniGlobal["ErrorMeter"]["scale"]));
 	scrollSpeed = stof(iniGlobal["ScrollSpeed"]["speed"]);
 	// Test
-	/*Uint64 offset = 6000;							// Test
-	for (Uint64 a = 0, b = 2, c = 3; a < 32; a += 4, b += 4, c += 4) {		// Test
-		chart.add(0, { a * 100 + offset, 0 });		// Test
-		chart.add(3, { b * 100 + offset, 2 });		// Test
-		chart.add(2, { b * 100 + offset, 1 });		// Test
-		chart.add(1, { c * 100 + offset, 1 });		// Test
-		chartVisible.add(0, { a * 100 + offset, 0 });	// Test
-		chartVisible.add(3, { b * 100 + offset, 2 });	// Test
-		chartVisible.add(2, { b * 100 + offset, 1 });	// Test
-		chartVisible.add(1, { c * 100 + offset, 1 });	// Test
-	}												// Test
-	chart.add(0, { 32 * 100 + offset, 0 });			// Test
-	chartVisible.add(0, { 32 * 100 + offset, 0 });	// Test
-
-	for (Uint64 a = 48, b = 50, c = 51; a < 64; a += 4, b += 4, c += 4) {	// Test
-		chart.add(1, { a * 100 + offset, 0 });		// Test
-		chart.add(0, { b * 100 + offset, 2 });		// Test
-		chart.add(3, { b * 100 + offset, 1 });		// Test
-		chart.add(3, { c * 100 + offset, 1 });		// Test
-		chartVisible.add(1, { a * 100 + offset, 0 });	// Test
-		chartVisible.add(0, { b * 100 + offset, 2 });	// Test
-		chartVisible.add(3, { b * 100 + offset, 1 });	// Test
-		chartVisible.add(3, { c * 100 + offset, 1 });	// Test
-	}												// Test
-	for (Uint64 a = 64, b = 66, c = 67; a < 80; a += 4, b += 4, c += 4) {	// Test
-		chart.add(1, { a * 100 + offset, 0 });		// Test
-		chart.add(0, { b * 100 + offset, 2 });		// Test
-		chart.add(2, { b * 100 + offset, 1 });		// Test
-		chart.add(2, { c * 100 + offset, 1 });		// Test
-		chartVisible.add(1, { a * 100 + offset, 0 });	// Test
-		chartVisible.add(0, { b * 100 + offset, 2 });	// Test
-		chartVisible.add(2, { b * 100 + offset, 1 });	// Test
-		chartVisible.add(2, { c * 100 + offset, 1 });	// Test
-	}												// Test
-	chart.add(1, { 80 * 100 + offset, 0 });			// Test
-	chartVisible.add(1, { 80 * 100 + offset, 0 });	// Test
-
-	Uint64 dist = 84;								// Test
-	Uint64 dist2 = 56;
-	offset = 17000;									// Test
-	for (int a = 0; a < 6; a += 3) {
-		chartVisible.add(2, { offset += dist, 0x63 });	// Test
-		chartVisible.add(1, { offset += dist, 0x61 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5f });	// Test
-		chartVisible.add(2, { offset += dist, 0x63 });	// Test
-		chartVisible.add(1, { offset += dist, 0x61 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5f });	// Test
-		chartVisible.add(2, { offset += dist, 0x63 });	// Test
-		chartVisible.add(1, { offset += dist, 0x61 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5f });	// Test
-		chartVisible.add(2, { offset += dist, 0x63 });	// Test
-		chartVisible.add(1, { offset += dist, 0x61 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5f });	// Test
-		chartVisible.add(2, { offset += dist, 0x63 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5f });	// Test
-		chartVisible.add(3, { offset += dist, 0x64 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5f });	// Test
-
-		chartVisible.add(1, { offset += dist, 0x66 });	// Test
-		chartVisible.add(2, { offset += dist, 0x61 });	// Test
-		chartVisible.add(3, { offset += dist, 0x5f });	// Test
-		chartVisible.add(1, { offset += dist, 0x66 });	// Test
-		chartVisible.add(2, { offset += dist, 0x61 });	// Test
-		chartVisible.add(3, { offset += dist, 0x5f });	// Test
-		chartVisible.add(1, { offset += dist, 0x66 });	// Test
-		chartVisible.add(3, { offset += dist, 0x5f });	// Test
-		chartVisible.add(0, { offset += dist, 0x64 });	// Test
-		chartVisible.add(3, { offset += dist, 0x5f });	// Test
-		chartVisible.add(1, { offset += dist, 0x63 });	// Test
-		chartVisible.add(3, { offset += dist, 0x5f });	// Test
-		chartVisible.add(2, { offset += dist, 0x61 });	// Test
-		chartVisible.add(3, { offset += dist, 0x5f });	// Test
-		chartVisible.add(1, { offset += dist, 0x62 });	// Test
-		chartVisible.add(3, { offset += dist, 0x5f });	// Test
-
-		chartVisible.add(0, { offset += dist, 0x60 });	// Test
-		chartVisible.add(1, { offset += dist, 0x5d });	// Test
-		chartVisible.add(2, { offset += dist, 0x5a });	// Test
-		chartVisible.add(0, { offset += dist, 0x60 });	// Test
-		chartVisible.add(1, { offset += dist, 0x5d });	// Test
-		chartVisible.add(2, { offset += dist, 0x5a });	// Test
-		chartVisible.add(0, { offset += dist, 0x60 });	// Test
-		chartVisible.add(2, { offset += dist, 0x5a });	// Test
-		chartVisible.add(0, { offset += dist, 0x60 });	// Test
-		chartVisible.add(2, { offset += dist, 0x5a });	// Test
-		chartVisible.add(0, { offset += dist, 0x60 });	// Test
-		chartVisible.add(1, { offset += dist, 0x62 });	// Test
-		chartVisible.add(0, { offset += dist, 0x60 });	// Test
-		chartVisible.add(2, { offset += dist, 0x65 });	// Test
-		chartVisible.add(0, { offset += dist, 0x60 });	// Test
-		chartVisible.add(3, { offset += dist, 0x66 });	// Test
-
-		chartVisible.add(0, { offset += dist, 0x69 });	// Test
-		chartVisible.add(1, { offset += dist, 0x66 });	// Test
-		chartVisible.add(2, { offset += dist, 0x62 });	// Test
-		chartVisible.add(0, { offset += dist, 0x69 });	// Test
-		chartVisible.add(1, { offset += dist, 0x66 });	// Test
-		chartVisible.add(2, { offset += dist, 0x62 });	// Test
-		chartVisible.add(0, { offset += dist, 0x69 });	// Test
-		chartVisible.add(2, { offset += dist, 0x62 });	// Test
-		chartVisible.add(3, { offset += dist, 0x6b });	// Test
-		chartVisible.add(2, { offset += dist, 0x66 });	// Test
-		chartVisible.add(1, { offset += dist, 0x62 });	// Test
-		chartVisible.add(3, { offset += dist, 0x6b });	// Test
-		chartVisible.add(2, { offset += dist, 0x66 });	// Test
-		chartVisible.add(1, { offset += dist, 0x62 });	// Test
-		chartVisible.add(3, { offset += dist, 0x6b });	// Test
-		chartVisible.add(1, { offset += dist, 0x62 });	// Test
-
-		chartVisible.add(0, { offset += dist, 0x60 });	// Test
-		chartVisible.add(2, { offset, 0x62 });			// Test
-		chartVisible.add(3, { offset, 0x66 });			// Test
-		chartVisible.add(1, { offset += dist, 0x4f });	// Test
-		chartVisible.add(2, { offset += dist, 0x51 });	// Test
-		chartVisible.add(3, { offset += dist, 0x53 });	// Test
-		chartVisible.add(1, { offset += dist, 0x55 });	// Test
-		chartVisible.add(2, { offset += dist, 0x58 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5a });	// Test
-		chartVisible.add(1, { offset += dist, 0x5d });	// Test
-
-		chartVisible.add(3, { offset += dist, 0x66 });	// Test
-		chartVisible.add(2, { offset += dist2, 0x62 });	// Test
-		chartVisible.add(1, { offset += dist2, 0x60 });	// Test
-		chartVisible.add(2, { offset += dist2, 0x5d });	// Test
-		chartVisible.add(1, { offset += dist2, 0x5a });	// Test
-		chartVisible.add(0, { offset += dist2, 0x58 });	// Test
-		chartVisible.add(3, { offset += dist2, 0x6a });	// Test
-		chartVisible.add(2, { offset += dist, 0x66 });	// Test
-		chartVisible.add(1, { offset += dist, 0x63 });	// Test
-		chartVisible.add(0, { offset += dist, 0x61 });	// Test
-
-		chartVisible.add(1, { offset += dist, 0x5e });	// Test
-		chartVisible.add(3, { offset, 0x67 });			// Test
-		chartVisible.add(2, { offset += dist, 0x56 });	// Test
-		chartVisible.add(1, { offset += dist, 0x58 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5a });	// Test
-		chartVisible.add(1, { offset += dist, 0x5e });	// Test
-		chartVisible.add(2, { offset += dist, 0x60 });	// Test
-		chartVisible.add(3, { offset += dist, 0x62 });	// Test
-		chartVisible.add(1, { offset += dist, 0x5e });	// Test
-		chartVisible.add(0, { offset += dist, 0x62 });	// Test
-		chartVisible.add(3, { offset, 0x6b });			// Test
-		chartVisible.add(2, { offset += dist, 0x58 });	// Test
-		chartVisible.add(1, { offset += dist, 0x5a });	// Test
-		chartVisible.add(0, { offset += dist, 0x5e });	// Test
-		chartVisible.add(2, { offset += dist, 0x60 });	// Test
-		chartVisible.add(3, { offset, 0x69 });			// Test
-		chartVisible.add(0, { offset += dist, 0x5e });	// Test
-		chartVisible.add(1, { offset += dist, 0x5a });	// Test
-		chartVisible.add(2, { offset += dist, 0x58 });	// Test
-
-		chartVisible.add(0, { offset += dist, 0x61 });	// Test
-		chartVisible.add(1, { offset, 0x6a });			// Test
-		chartVisible.add(3, { offset += dist, 0x52 });	// Test
-		chartVisible.add(2, { offset += dist, 0x54 });	// Test
-		chartVisible.add(1, { offset += dist, 0x57 });	// Test
-		chartVisible.add(0, { offset += dist, 0x59 });	// Test
-		chartVisible.add(1, { offset += dist, 0x5b });	// Test
-		chartVisible.add(2, { offset += dist, 0x5f });	// Test
-		chartVisible.add(3, { offset += dist, 0x61 });	// Test
-		chartVisible.add(0, { offset += dist, 0x62 });	// Test
-		chartVisible.add(2, { offset, 0x6b });			// Test
-		chartVisible.add(1, { offset += dist, 0x54 });	// Test
-		chartVisible.add(3, { offset += dist, 0x57 });	// Test
-		chartVisible.add(2, { offset += dist, 0x59 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5b });	// Test
-		chartVisible.add(1, { offset += dist, 0x5f });	// Test
-		chartVisible.add(3, { offset += dist, 0x61 });	// Test
-		chartVisible.add(2, { offset += dist, 0x63 });	// Test
-
-		chartVisible.add(0, { offset += dist, 0x63 });	// Test
-		chartVisible.add(3, { offset, 0x6c });			// Test
-		chartVisible.add(2, { offset += dist, 0x5f });	// Test
-		chartVisible.add(1, { offset += dist, 0x5b });	// Test
-		chartVisible.add(0, { offset += dist, 0x59 });	// Test
-		chartVisible.add(3, { offset += dist, 0x54 });	// Test
-		chartVisible.add(0, { offset += dist, 0x57 });	// Test
-		chartVisible.add(1, { offset += dist, 0x59 });	// Test
-		chartVisible.add(2, { offset += dist, 0x5b });	// Test
-		chartVisible.add(0, { offset += dist, 0x5d });	// Test
-		chartVisible.add(1, { offset, 0x66 });			// Test
-		chartVisible.add(3, { offset += dist, 0x55 });	// Test
-		chartVisible.add(0, { offset += dist, 0x58 });	// Test
-		chartVisible.add(2, { offset += dist, 0x5a });	// Test
-		chartVisible.add(3, { offset += dist, 0x58 });	// Test
-		chartVisible.add(0, { offset += dist, 0x5a });	// Test
-		chartVisible.add(1, { offset += dist, 0x5d });	// Test
-		chartVisible.add(3, { offset += dist, 0x60 });	// Test
-	}
-	chartVisible.add(2, { offset += dist, 0x9e });		// Test*/
-	bmsParser.parseFile("sound_test/[—L‰êàY]Defeatawakenbattleship/SPI.bms");
-	double offset = 14000;
+	//bmsParser.parseFile("sound_test/[—L‰êàY]Defeatawakenbattleship/SPI.bms");
+	bmsParser.parseFile("sound_test/Altale/output.bm4");
+	double offset = 0;
+	double currentBpm = bmsParser.bpm;
 	for (int bar = 0; bar <= bmsParser.barMax; bar++) {
-		double barLength = (double)4 / bmsParser.bpm * 60000;
+		double barLength;
+		if (!bmsParser.bpmInt[bar].empty()) { // Test
+			currentBpm = bmsParser.bpmInt[bar][0];
+		}
+		barLength = (double)4 / currentBpm * 60000;
+		barLength = bmsParser.timeSignature[bar] ? barLength * bmsParser.timeSignature[bar] : barLength;
 		for (int key = 0; key < 8; key++) {
 			int sizeNote = bmsParser.note[bar][key].size();
 			double keyLength = barLength / sizeNote;
 			double keyOffset = offset;
 			for (int note = 0; note < sizeNote; note++) {
 				if (bmsParser.note[bar][key][note]) {
-					chartVisible.add(key < 4 ? key : 4, { (Uint64)keyOffset, bmsParser.note[bar][key][note] });
+					chart.add(key < 4 ? key : 4, { (Uint64)keyOffset, bmsParser.note[bar][key][note] });
 				}
 				keyOffset += keyLength;
 			}
@@ -270,7 +87,7 @@ void Game::init() {
 			double keyOffset = offset;
 			for (int bgm = 0; bgm < sizeBgm; bgm++) {
 				if (bmsParser.bgm[bar][idx][bgm]) {
-					chartVisible.add(4, { (Uint64)keyOffset, bmsParser.bgm[bar][idx][bgm] });
+					chart.add(4, { (Uint64)keyOffset, bmsParser.bgm[bar][idx][bgm] });
 				}
 				keyOffset += keyLength;
 			}
@@ -279,12 +96,19 @@ void Game::init() {
 	}
 	for (int wav = 0; wav < 1536; wav++) {
 		if (!bmsParser.wav[wav].empty()) {
-			char fileName[100] = "sound_test/[—L‰êàY]Defeatawakenbattleship/";
+			//char fileName[100] = "sound_test/[—L‰êàY]Defeatawakenbattleship/";
+			char fileName[100] = "sound_test/Altale/";
 			strcat(fileName, bmsParser.wav[wav].c_str());
 			audio.loadSound(wav, fileName);
 			//printf("%s\n", fileName);
 		}
+		else {
+			audio.loadSound(wav, "0");
+		}
 	}
+	//chartOffset = 16000;
+	chartOffset = 25000;
+	chartVisible.init(&chart);
 }
 
 void Game::exit() {
@@ -297,14 +121,14 @@ void Game::update() {
 
 	// Key
 	static JudgeKeySound judgeKeySound({ 0, 0 }, 6);
-	if (score.missJudger(1/*Test*/, chartVisible, judgeNoteVisible)) {
+	if (score.missJudger(1/*Test*/, chartVisible, judgeNoteVisible, chartOffset)) {
 		judgeKeySound.judge = 5;
 	}
 	const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
 	for (int key = 0; key < 4; key++) {
 		if (keyboardState[keyMap[key]]) {
 			if (!keyPressed[key]) {
-				judgeKeySound = score.judger(1/*Test*/, key, chartVisible, judgeNoteVisible, errorMeter);
+				judgeKeySound = score.judger(1/*Test*/, key, chartVisible, judgeNoteVisible, errorMeter, chartOffset);
 				if (judgeKeySound.sound) {
 					audio.playSound(judgeKeySound.sound);
 				}
@@ -317,18 +141,21 @@ void Game::update() {
 			keyPressed[key] = false;
 		}
 	}
-	judgeNoteVisible.update();
-	judgeKeyVisible.update();
-	chartVisible.update(&audio);
+	judgeNoteVisible.update(chartOffset);
+	judgeKeyVisible.update(chartOffset);
+	chartVisible.update(&audio, &chart, chartOffset);
 	errorMeter.update();
 
 	graphic.drawReceipter();
 	graphic.drawKeyPressed(keyPressed);
-	graphic.drawNote(chartVisible.begin(), chartVisible.end(), scrollSpeed);
-	graphic.drawJudgeNote(judgeNoteVisible.begin(), judgeNoteVisible.end());
-	graphic.drawJudgeKey(judgeKeyVisible.begin(), judgeKeyVisible.end());
+	graphic.drawNote(chartVisible, scrollSpeed, chartOffset);
+	graphic.drawJudgeNote(judgeNoteVisible, chartOffset);
+	graphic.drawJudgeKey(judgeKeyVisible, chartOffset);
 	graphic.drawJudge(judgeKeySound.judge);
 	graphic.drawErrorMeter(errorMeter.begin(), errorMeter.end(), errorMeter.getLifeTime(), errorMeter.getScale());
+	char combo[32];
+	sprintf(combo, "%d", score.getCombo());
+	graphic.drawCombo(combo);
 	graphic.drawText();
 	// Debug info
 	char fpsBuffer[32] = {};
@@ -339,7 +166,29 @@ void Game::update() {
 	sprintf(keyCountBufffer, "Key pressed: %d", judgeKey.count());
 	char chartVisibleBufffer[32] = {};
 	sprintf(chartVisibleBufffer, "Visible note: %d", chartVisible.count());
-	char* debugText[5] = { fpsBuffer, sizeBuffer, keyCountBufffer, chartVisibleBufffer };
+	char chartBufffer[32] = {};
+	sprintf(chartBufffer, "Chart note: %d", chart.count());
+	char scoreV1Bufffer[32] = {};
+	sprintf(scoreV1Bufffer, "ScoreV1: %.4f", score.getScoreV1());
+	char scoreV2Bufffer[32] = {};
+	sprintf(scoreV2Bufffer, "ScoreV2: %.4f", score.getScoreV2());
+	char avgErrorBufffer[32] = {};
+	sprintf(avgErrorBufffer, "AvgError: %.4f", score.getAvgError());
+	char varianceBufffer[32] = {};
+	sprintf(varianceBufffer, "Variance: %.4f", score.getVariance());
+	char SDBufffer[32] = {};
+	sprintf(SDBufffer, "SD: %.4f", score.getSD());
+	char* debugText[12] = { fpsBuffer,
+		sizeBuffer,
+		keyCountBufffer,
+		chartVisibleBufffer,
+		chartBufffer,
+		scoreV1Bufffer,
+		scoreV2Bufffer,
+		avgErrorBufffer,
+		varianceBufffer,
+		SDBufffer
+	};
 
 	graphic.drawDebug(debugText);
 	graphic.draw();

@@ -38,29 +38,29 @@ std::list<JudgeErrorTime>::iterator ErrorMeter::end() {
 	return errorList.end();
 }
 
-double Score::scoreV1(double difficulty, Uint64 errorMs) {
+int Score::judgeScoreV1(double difficulty, Uint64 errorMs) {
 	double errorAbs = difficulty * errorMs;
 	if (errorAbs <= 22.5) {
-		return 1;
+		return 5;
 	}
 	else if (errorAbs <= 45) {
-		return 0.8;
+		return 4;
 	}
 	else if (errorAbs <= 90) {
-		return 0.6;
+		return 3;
 	}
 	else if (errorAbs <= 135) {
-		return 0.4;
+		return 2;
 	}
 	else if (errorAbs <= 180) {
-		return 0.2;
+		return 1;
 	}
 	else {
 		return 0;
 	}
 }
 
-double Score::scoreV2(double difficulty, Uint64 errorMs) {
+double Score::judgeScoreV2(double difficulty, Uint64 errorMs) {
 	double errorAbs = difficulty * errorMs;
 	if (errorAbs <= 2) { // (0, 1)
 		return 1;
@@ -106,7 +106,7 @@ int Score::judge(double difficulty, Uint64 errorMs) {
 	}
 }
 
-JudgeKeySound Score::judger(double difficulty, int key, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible, ErrorMeter& errorMeter) {
+JudgeKeySound Score::judger(double difficulty, int key, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible, ErrorMeter& errorMeter, Uint64 chartOffset) {
 	Uint64 errorMs;
 	bool early;
 	bool checkNextJudge = false;
@@ -118,34 +118,37 @@ JudgeKeySound Score::judger(double difficulty, int key, ChartVisible& chartVisib
 		judgeKeySound[k].judge = 6; // Default judge
 	}
 	for (std::list<KeySound>::iterator iter = judgeNote = chartVisible.begin(key); iter != chartVisible.end(key); iter++) {
-		early = SDL_GetTicks64() < iter->time;
-		errorMs = early ? iter->time - SDL_GetTicks64() : SDL_GetTicks64() - iter->time;
+		early = SDL_GetTicks64() < iter->time + chartOffset;
+		errorMs = early ? iter->time + chartOffset - SDL_GetTicks64() : SDL_GetTicks64() - iter->time - chartOffset;
 		judgeResult = judge(difficulty, errorMs);
-		if (judgeResult <= 3) { // Judge window overlap
+		if (judgeResult <= 3) { // Better than good or judge window overlap and better than good
+			updateScore(difficulty, early, errorMs, judgeResult);
 			judgeKeySound[key] = {*iter,  judgeResult};
 			judgeNoteVisible.add(key, judgeKeySound[key]);
 			chartVisible.remove(key, iter);
-			judgeKeySound[key].time = SDL_GetTicks64();
+			judgeKeySound[key].time = SDL_GetTicks64() - chartOffset;
 			errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
 			return judgeKeySound[key];
 		}
-		else if (judgeResult > 3 && judgeResult <= 5) {
-			if (!early) {
+		else if (judgeResult > 3 && judgeResult <= 5) { // Bad or miss
+			if (!early) { // Prevent judge window overlap (Later (time) note > earlier (time) note)
 				judgeNote = iter;
 				checkNextJudge = true;
 			}
-			else if (judgeResult == 4) {
+			else if (judgeResult == 4) { // Early bad
+				updateScore(difficulty, early, errorMs, judgeResult);
 				judgeKeySound[key] = { *iter,  judgeResult };
 				judgeNoteVisible.add(key, judgeKeySound[key]);
 				chartVisible.remove(key, iter);
-				judgeKeySound[key].time = SDL_GetTicks64();
+				judgeKeySound[key].time = SDL_GetTicks64() - chartOffset;
 				errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
 				return judgeKeySound[key];
 			}
-			else if (judgeResult == 5) {
+			else if (judgeResult == 5) { // Early miss (early poor)
+				earlyMiss();
 				judgeKeySound[key] = { *iter,  judgeResult };
 				judgeNoteVisible.add(key, judgeKeySound[key]);
-				judgeKeySound[key].time = SDL_GetTicks64();
+				judgeKeySound[key].time = SDL_GetTicks64() - chartOffset;
 				errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
 				return judgeKeySound[key];
 			}
@@ -154,33 +157,38 @@ JudgeKeySound Score::judger(double difficulty, int key, ChartVisible& chartVisib
 	}
 	// Does not have judge window overlap
 	if (checkNextJudge) { // Return judge 3~5
+		updateScore(difficulty, early, errorMs, judgeResult);
 		judgeKeySound[key] = { *judgeNote,  judgeResult };
 		judgeNoteVisible.add(key, { *judgeNote,  judgeResult });
 		chartVisible.remove(key, judgeNote);
-		judgeKeySound[key].time = SDL_GetTicks64();
+		judgeKeySound[key].time = SDL_GetTicks64() - chartOffset;
 		errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
 		return judgeKeySound[key];
 	}
-	else { // Return judge 0~2
+	else { // Return judge 4~5
 		if (judgeResult != 6) {
+			updateScore(difficulty, early, errorMs, judgeResult);
 			judgeKeySound[key] = { lastNote[key], judgeResult };
-			judgeKeySound[key].time = SDL_GetTicks64();
+			judgeNoteVisible.add(key, { *judgeNote,  judgeResult });
+			chartVisible.remove(key, judgeNote);
+			judgeKeySound[key].time = SDL_GetTicks64() - chartOffset;
 			errorMeter.add(SDL_GetTicks64(), judgeResult, early ? -(int)errorMs : (int)errorMs);
 			return judgeKeySound[key];
 		}
 		else { // Not in any judge window
-			//judgeKeySound = { lastNote[key], 6 };
-			judgeKeySound[key].time = SDL_GetTicks64();
+			judgeKeySound[key] = { lastNote[key], 6} ;
+			judgeKeySound[key].time = SDL_GetTicks64() - chartOffset;
 			return judgeKeySound[key];
 		}
 	}
 }
 
-bool Score::missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible) {
+bool Score::missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible, Uint64 chartOffset) {
 	bool flag = false;
 	for (int key = 0; key < 4; key++) {
 		for (std::list<KeySound>::iterator iter = chartVisible.begin(key); iter != chartVisible.end(key);) {
-			if (SDL_GetTicks64() >= iter->time + lateMissMs) {
+			if (SDL_GetTicks64() >= iter->time + chartOffset + lateMissMs) {
+				miss();
 				judgeNoteVisible.add(key, { *iter,  5 });
 				iter = chartVisible.remove(key, iter);
 				flag = true;
@@ -191,4 +199,69 @@ bool Score::missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisib
 		}
 	}
 	return flag;
+}
+
+void Score::init(int chartCount) {
+	scoreV1 = 0;
+	maxScoreV1 = chartCount * 5;
+	scoreV2 = 0;
+	maxScoreV2 = (double)chartCount;
+	judgedNoteCount = 0;
+	for (int judge = 0; judge < 6; judge++) {
+		judgeCounter[judge] = 0;
+	}
+	notMissCount = 0;
+	combo = 0;
+	mean = 0;
+	variance = 0;
+	M2 = 0;
+}
+
+void Score::updateScore(double difficulty, bool early, Uint64 errorMs, int judgeResult) {
+	scoreV1 += judgeScoreV1(difficulty, errorMs);
+	scoreV2 += judgeScoreV2(difficulty, errorMs);
+	judgedNoteCount++;
+	judgeCounter[judgeResult]++;
+	notMissCount++;
+	judgeResult <= 2 ? combo++ : combo = 0;
+	int errorMsSigned = early ? -(int)errorMs : errorMs;
+	// Welford's online algorithm
+	double delta = errorMsSigned - mean;
+	mean += delta / notMissCount;
+	double delta2 = errorMsSigned - mean;
+	M2 += delta * delta2;
+}
+
+void Score::earlyMiss() {
+	judgeCounter[5]++;
+}
+
+void Score::miss() {
+	judgedNoteCount++;
+	judgeCounter[4]++;
+	combo = 0;
+}
+
+double Score::getScoreV1() {
+	return judgedNoteCount ? (double)20 * scoreV1 / judgedNoteCount : 0;
+}
+
+double Score::getScoreV2() {
+	return judgedNoteCount ? (double)100 * scoreV2 / judgedNoteCount : 0;
+}
+
+double Score::getAvgError() {
+	return mean;
+}
+
+double Score::getVariance() {
+	return notMissCount ? M2 / notMissCount : 0;
+}
+
+double Score::getSD() {
+	return sqrt(getVariance());
+}
+
+int Score::getCombo() {
+	return combo;
 }

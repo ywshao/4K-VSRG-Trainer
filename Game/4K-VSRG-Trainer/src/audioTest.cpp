@@ -67,6 +67,11 @@ void Audio::playSound(int index) {
 }
 
 void Audio::loadSound(int index, const char* path) {
+	if (!strcmp(path, "0")) {
+		sound[index].left.push_back(0);
+		sound[index].right.push_back(0);
+		return;
+	}
 	SF_INFO sfInfo;
 	SNDFILE* sndFile = sf_open(path, SFM_READ, &sfInfo);
 	//printf("Channels: %d\n", sfInfo.channels);
@@ -88,8 +93,26 @@ void Audio::loadSound(int index, const char* path) {
 		float readData[MAX_LEN];
 		while (count = sf_read_float(sndFile, readData, MAX_LEN)) {
 			for (int idx = 0; idx < count;) {
-				sound[index].left.push_back(readData[idx++]);
-				sound[index].right.push_back(readData[idx++]);
+				if (sfInfo.samplerate == 11025) {
+					sound[index].left.push_back(readData[idx]);
+					sound[index].left.push_back(readData[idx]);
+					sound[index].left.push_back(readData[idx]);
+					sound[index].left.push_back(readData[idx++]);
+					sound[index].right.push_back(readData[idx]);
+					sound[index].right.push_back(readData[idx]);
+					sound[index].right.push_back(readData[idx]);
+					sound[index].right.push_back(readData[idx++]);
+				}
+				else if (sfInfo.samplerate == 22050) {
+					sound[index].left.push_back(readData[idx]);
+					sound[index].left.push_back(readData[idx++]);
+					sound[index].right.push_back(readData[idx]);
+					sound[index].right.push_back(readData[idx++]);
+				}
+				else {
+					sound[index].left.push_back(readData[idx++]);
+					sound[index].right.push_back(readData[idx++]);
+				}
 			}
 		}
 	}

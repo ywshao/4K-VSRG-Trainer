@@ -61,13 +61,13 @@ void Graphic::draw() {
 	GPU_Flip(window);
 }
 
-void Graphic::drawNote(std::list<KeySound>::iterator begin[4], std::list<KeySound>::iterator end[4], float scrollSpeed) {
+void Graphic::drawNote(ChartVisible &chartVisible, float scrollSpeed, Uint64 chartOffset) {
 	//GPU_Blit(note[0], NULL, window, 0, 0);
 	//GPU_Blit(note[1], NULL, window, 200, 200);
 	for (int key = 0; key < 4; key++) {
-		for (std::list<KeySound>::iterator iter = begin[key]; iter != end[key]; iter++) {
+		for (std::list<KeySound>::iterator iter = chartVisible.begin(key); iter != chartVisible.end(key); iter++) {
 			//GPU_Blit(note[key], NULL, window, 300 + key * 100, (SDL_GetTicks64() - iter->time) * scrollSpeed + receipterY);
-			GPU_Blit(note[key], NULL, window, 300 + key * 100, (int)(SDL_GetTicks64() - iter->time) * scrollSpeed + receipterY);
+			GPU_Blit(note[key], NULL, window, 300 + key * 100, (int)(SDL_GetTicks64() - chartOffset - iter->time) * scrollSpeed + receipterY);
 		}
 	}
 	/*
@@ -96,20 +96,20 @@ void Graphic::drawKeyPressed(bool keyPressed[4]) {
 	}
 }
 
-void Graphic::drawJudgeNote(std::list<JudgeKeySound>::iterator begin[4], std::list<JudgeKeySound>::iterator end[4]) {
+void Graphic::drawJudgeNote(JudgeVisible& judgeNoteVisible, Uint64 chartOffset) {
 	for (int key = 0; key < 4; key++) {
-		std::list<JudgeKeySound>::iterator iter = begin[key];
-		for (; iter != end[key]; iter++) {
-			GPU_Blit(judgeNote[iter->judge], NULL, window, 800 + key * 100, SDL_GetTicks64() - iter->time);
+		std::list<JudgeKeySound>::iterator iter = judgeNoteVisible.begin(key);
+		for (; iter != judgeNoteVisible.end(key); iter++) {
+			GPU_Blit(judgeNote[iter->judge], NULL, window, 800 + key * 100, SDL_GetTicks64() - iter->time - chartOffset);
 		}
 	}
 }
 
-void Graphic::drawJudgeKey(std::list<JudgeKeySound>::iterator begin[4], std::list<JudgeKeySound>::iterator end[4]) {
+void Graphic::drawJudgeKey(JudgeVisible& judgeKeyVisible, Uint64 chartOffset) {
 	for (int key = 0; key < 4; key++) {
-		std::list<JudgeKeySound>::iterator iter = begin[key];
-		for (; iter != end[key]; iter++) {
-			GPU_Blit(judgeKey[iter->judge], NULL, window, 800 + key * 100, SDL_GetTicks64() - iter->time);
+		std::list<JudgeKeySound>::iterator iter = judgeKeyVisible.begin(key);
+		for (; iter != judgeKeyVisible.end(key); iter++) {
+			GPU_Blit(judgeKey[iter->judge], NULL, window, 800 + key * 100, SDL_GetTicks64() - iter->time - chartOffset);
 		}
 	}
 }
@@ -148,8 +148,12 @@ void Graphic::drawErrorMeter(std::list<JudgeErrorTime>::iterator begin, std::lis
 	}
 }
 
+void Graphic::drawCombo(char* combo) {
+	nfont[FONT_JUDGE].draw(window, 400, 220, SDL_Color{ 255, 255, 255, 255 }, combo);
+}
+
 void Graphic::drawText() {
-	nfont[FONT_REGULAR].draw(window, 700, 300, SDL_Color{ 255, 255, 255, 255 }, "Sound sample taken from:\nDefeat awaken battle ship\nArtist: Sakamiya");
+	nfont[FONT_REGULAR].draw(window, 700, 300, SDL_Color{ 255, 255, 255, 255 }, "Sound sample taken from:\nAltale\nArtist: Sakuzyo");
 }
 
 void Graphic::drawDebug(char* debugText[]) {

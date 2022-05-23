@@ -33,14 +33,37 @@ public:
 class Score {
 private:
 	// Stepmania & Etterna interval
-	double scoreV1(double difficulty, Uint64 errorMs);
+	int judgeScoreV1(double difficulty, Uint64 errorMs);
 	// Etterna Wife3 style interval
-	double scoreV2(double difficulty, Uint64 errorMs);
+	double judgeScoreV2(double difficulty, Uint64 errorMs);
 	//
 	int judge(double difficulty, Uint64 errorMs);
+	// Update score
+	void updateScore(double difficulty, bool early, Uint64 errorMs, int judgeResult);
+	void earlyMiss();
+	void miss();
 	//
-	double score;
+	int scoreV1;
+	int maxScoreV1;
+	double scoreV2;
+	double maxScoreV2;
+	int judgedNoteCount;
+	int judgeCounter[6];
+	int notMissCount;
+	int combo;
+	double mean;
+	double variance;
+	double M2;
 public:
-	JudgeKeySound judger(double difficulty, int key, ChartVisible &chartVisible, JudgeVisible& judgeNoteVisible, ErrorMeter& errorMeter);
-	bool missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible);
+	JudgeKeySound judger(double difficulty, int key, ChartVisible &chartVisible, JudgeVisible& judgeNoteVisible, ErrorMeter& errorMeter, Uint64 chartOffset);
+	bool missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible, Uint64 chartOffset);
+
+	void init(int chartCount);
+
+	double getScoreV1();
+	double getScoreV2();
+	double getAvgError();
+	double getVariance();
+	double getSD();
+	int getCombo();
 };

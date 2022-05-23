@@ -35,13 +35,14 @@ public:
 	void clear();
 	void draw();
 
-	void drawNote(std::list<KeySound>::iterator begin[4], std::list<KeySound>::iterator end[4], float scrollSpeed);
+	void drawNote(ChartVisible& chartVisible, float scrollSpeed, Uint64 chartOffset);
 	void drawReceipter();
 	void drawKeyPressed(bool keyPressed[4]);
-	void drawJudgeNote(std::list<JudgeKeySound>::iterator begin[4], std::list<JudgeKeySound>::iterator end[4]);
-	void drawJudgeKey(std::list<JudgeKeySound>::iterator begin[4], std::list<JudgeKeySound>::iterator end[4]);
+	void drawJudgeNote(JudgeVisible& judgeNoteVisible, Uint64 chartOffset);
+	void drawJudgeKey(JudgeVisible& judgeKeyVisible, Uint64 chartOffset);
 	void drawJudge(int judge);
 	void drawErrorMeter(std::list<JudgeErrorTime>::iterator begin, std::list<JudgeErrorTime>::iterator end, int lifeTime, float scale);
+	void drawCombo(char* combo);
 	void drawText();
 	void drawDebug(char* debugText[]);
 };
