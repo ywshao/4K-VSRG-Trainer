@@ -6,7 +6,7 @@
 #include <list>
 
 #define soundVolume 0.2
-#define maxSound 2000
+#define maxSound 1536
 
 class Audio {
 private:
@@ -30,11 +30,13 @@ private:
 	PaStream* stream;
 	const int framesPerBuffer = 256;
 	std::list<PlayingSound> playingSounds;
-	Sound sound[maxSound];	// Test temp
+	Sound sound[maxSound];
 public:
 	void portAudioInit(PaDeviceIndex device);
 	void portAudioExit();
 	void playSound(int index);
 	void loadSound(int index, const char *path);
+	void offloadSound(int index);
+	void stopSound();
 	int getCurrentSoundNum();
 };

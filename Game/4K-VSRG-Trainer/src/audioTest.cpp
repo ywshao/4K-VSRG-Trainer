@@ -109,8 +109,12 @@ void Audio::loadSound(int index, const char* path) {
 					sound[index].right.push_back(readData[idx]);
 					sound[index].right.push_back(readData[idx++]);
 				}
-				else {
+				else if (sfInfo.samplerate == 44100 && sfInfo.channels == 2) {
 					sound[index].left.push_back(readData[idx++]);
+					sound[index].right.push_back(readData[idx++]);
+				}
+				else if (sfInfo.samplerate == 44100 && sfInfo.channels == 1) {
+					sound[index].left.push_back(readData[idx]);
 					sound[index].right.push_back(readData[idx++]);
 				}
 			}
@@ -128,6 +132,16 @@ void Audio::loadSound(int index, const char* path) {
 			}
 		}
 	}
+	sf_close(sndFile);
+}
+
+void Audio::offloadSound(int index) {
+	sound[index].left.clear();
+	sound[index].right.clear();
+}
+
+void Audio::stopSound() {
+	playingSounds.clear();
 }
 
 int Audio::getCurrentSoundNum() {

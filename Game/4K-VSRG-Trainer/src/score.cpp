@@ -201,11 +201,9 @@ bool Score::missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisib
 	return flag;
 }
 
-void Score::init(int chartCount) {
+void Score::init() {
 	scoreV1 = 0;
-	maxScoreV1 = chartCount * 5;
 	scoreV2 = 0;
-	maxScoreV2 = (double)chartCount;
 	judgedNoteCount = 0;
 	for (int judge = 0; judge < 6; judge++) {
 		judgeCounter[judge] = 0;

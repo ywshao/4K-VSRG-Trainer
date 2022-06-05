@@ -6,6 +6,19 @@ void KeyLogger<KeySound>::clear() {
 	}
 }
 
+void KeyLogger<JudgeKeySound>::clear() {
+	for (int key = 0; key < keyNum; key++) {
+		keyLog[key].clear();
+	}
+}
+
+void KeyLoggerBgm::clear() {
+	for (int key = 0; key < keyNum; key++) {
+		keyLog[key].clear();
+	}
+	bgm = std::priority_queue<KeySound, std::vector<KeySound>, KeySoundCmp>();
+}
+
 void KeyLogger<KeySound>::add(int key, KeySound data) {
 	keyLog[key].push_back(data);
 }

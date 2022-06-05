@@ -10,5 +10,5 @@ private:
 	std::string convertIntTo36base(int wavNum);
 	std::string convertIntToHex(int wavNum);
 public:
-	void convert(const char* file);
+	void convert(const char* file, const PatternParameter patternParameter);
 };

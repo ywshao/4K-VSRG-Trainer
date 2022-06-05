@@ -46,7 +46,7 @@ std::string Bms7To4::convertIntToHex(int wavNum) {
 	return returnNum;
 }
 
-void Bms7To4::convert(const char* file) {
+void Bms7To4::convert(const char* file, const PatternParameter patternParameter) {
 	std::ofstream fstream("output.bm4");
 	bmsParser.parseFile(file);
 	fstream << "#BPM" << ' ' << bmsParser.bpm << std::endl;

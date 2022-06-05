@@ -37,3 +37,7 @@ Game/4K-VSRG-Trainer/sound_test
 Game/4K-VSRG-Trainer/x64/
 Game/Audio-Device-Detector/x64
 BMS/BMS-Parser/x64
+BMS/BMS7To4/x64
+BMS/BMS-Classify
+BMS/BMS-Extract
+*/*/*.bms

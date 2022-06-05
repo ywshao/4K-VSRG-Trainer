@@ -44,9 +44,7 @@ private:
 	void miss();
 	//
 	int scoreV1;
-	int maxScoreV1;
 	double scoreV2;
-	double maxScoreV2;
 	int judgedNoteCount;
 	int judgeCounter[6];
 	int notMissCount;
@@ -58,7 +56,7 @@ public:
 	JudgeKeySound judger(double difficulty, int key, ChartVisible &chartVisible, JudgeVisible& judgeNoteVisible, ErrorMeter& errorMeter, Uint64 chartOffset);
 	bool missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible, Uint64 chartOffset);
 
-	void init(int chartCount);
+	void init();
 
 	double getScoreV1();
 	double getScoreV2();

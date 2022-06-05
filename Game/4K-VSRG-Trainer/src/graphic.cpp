@@ -153,7 +153,70 @@ void Graphic::drawCombo(char* combo) {
 }
 
 void Graphic::drawText() {
-	nfont[FONT_REGULAR].draw(window, 700, 300, SDL_Color{ 255, 255, 255, 255 }, "Sound sample taken from:\nAltale\nArtist: Sakuzyo");
+	//nfont[FONT_REGULAR].draw(window, 700, 300, SDL_Color{ 255, 255, 255, 255 }, "Sound sample taken from:\nPEACE BREAKER\nArtist: Omnipotenx(xi)");
+	nfont[FONT_REGULAR].draw(window, 700, 300, SDL_Color{ 255, 255, 255, 255 }, "Sound sample taken from:\n(In the description)");
+}
+
+void Graphic::drawGameType(int gameSelect) {
+	const static char* gameType[3] = {"Train", "Dan", "Exit"};
+	for (int idx = -7; idx <= 7; idx++) {
+		nfont[FONT_REGULAR].draw(window, 100, (idx + 7) * 50, SDL_Color{ 255, 255, 255, 255 }, gameType[(idx + gameSelect + 3 * 3) % 3]);
+	}
+	nfont[FONT_REGULAR].draw(window, 60, 350, SDL_Color{ 255, 255, 255, 255 }, ">");
+}
+
+void Graphic::drawBms(std::vector<std::filesystem::path>& bmsDir, int bmsSelect) {
+	for (int idx = -7; idx <= 7; idx++) {
+		nfont[FONT_REGULAR].draw(window, 100, (idx + 7) * 50, SDL_Color{ 255, 255, 255, 255 }, bmsDir[(idx + bmsSelect + bmsDir.size() * 7) % bmsDir.size()].string().c_str());
+	}
+	nfont[FONT_REGULAR].draw(window, 60, 350, SDL_Color{ 255, 255, 255, 255 }, ">");
+}
+
+void Graphic::drawBmsFile(std::vector<std::vector<std::filesystem::path>>& bmsFileDir, int bmsSelect, int bmsFileSelect) {
+	for (int idx = -7; idx <= 7; idx++) {
+		nfont[FONT_REGULAR].draw(window, 100, (idx + 7) * 50, SDL_Color{ 255, 255, 255, 255 }, bmsFileDir[bmsSelect][(idx + bmsFileSelect + bmsFileDir[bmsSelect].size() * 7) % bmsFileDir[bmsSelect].size()].string().c_str());
+	}
+	nfont[FONT_REGULAR].draw(window, 60, 350, SDL_Color{ 255, 255, 255, 255 }, ">");
+}
+
+void Graphic::drawDifficultySelect(PatternParameter& patternParameter, int difficultySelect) {
+	char buffer[64];
+	nfont[FONT_REGULAR].draw(window, 100, 350, SDL_Color{ 255, 255, 255, 255 }, "Start");
+	nfont[FONT_REGULAR].draw(window, 100, 400, SDL_Color{ 255, 255, 255, 255 }, "+0.01");
+	nfont[FONT_REGULAR].draw(window, 100, 450, SDL_Color{ 255, 255, 255, 255 }, "-0.01");
+	sprintf(buffer, "%.2f", (float)patternParameter.rate / 100);
+	nfont[FONT_REGULAR].draw(window, 200, 250, SDL_Color{ 255, 255, 255, 255 }, "Rate");
+	nfont[FONT_REGULAR].draw(window, 200, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
+	nfont[FONT_REGULAR].draw(window, 250, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
+	sprintf(buffer, "%.2f", (float)patternParameter.jack / 100);
+	nfont[FONT_REGULAR].draw(window, 300, 250, SDL_Color{ 255, 255, 255, 255 }, "Jack");
+	nfont[FONT_REGULAR].draw(window, 300, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
+	nfont[FONT_REGULAR].draw(window, 350, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
+	sprintf(buffer, "%.2f", (float)patternParameter.jackLength / 100);
+	nfont[FONT_REGULAR].draw(window, 400, 250, SDL_Color{ 255, 255, 255, 255 }, "Jack\nLength");
+	nfont[FONT_REGULAR].draw(window, 400, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
+	nfont[FONT_REGULAR].draw(window, 450, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
+	sprintf(buffer, "%.2f", (float)patternParameter.speedTech / 100);
+	nfont[FONT_REGULAR].draw(window, 500, 250, SDL_Color{ 255, 255, 255, 255 }, "Speed\nTech");
+	nfont[FONT_REGULAR].draw(window, 500, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
+	nfont[FONT_REGULAR].draw(window, 550, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
+	sprintf(buffer, "%.2f", (float)patternParameter.jump / 100);
+	nfont[FONT_REGULAR].draw(window, 600, 250, SDL_Color{ 255, 255, 255, 255 }, "Jump");
+	nfont[FONT_REGULAR].draw(window, 600, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
+	nfont[FONT_REGULAR].draw(window, 650, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
+	sprintf(buffer, "%.2f", (float)patternParameter.hand / 100);
+	nfont[FONT_REGULAR].draw(window, 700, 250, SDL_Color{ 255, 255, 255, 255 }, "Hand");
+	nfont[FONT_REGULAR].draw(window, 700, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
+	nfont[FONT_REGULAR].draw(window, 750, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
+	sprintf(buffer, "%.2f", (float)patternParameter.quad / 100);
+	nfont[FONT_REGULAR].draw(window, 800, 250, SDL_Color{ 255, 255, 255, 255 }, "Quad");
+	nfont[FONT_REGULAR].draw(window, 800, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
+	nfont[FONT_REGULAR].draw(window, 850, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
+	sprintf(buffer, "%.2f", (float)patternParameter.delay / 100);
+	nfont[FONT_REGULAR].draw(window, 900, 250, SDL_Color{ 255, 255, 255, 255 }, "Delay");
+	nfont[FONT_REGULAR].draw(window, 900, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
+	nfont[FONT_REGULAR].draw(window, 950, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
+	nfont[FONT_REGULAR].draw(window, 200 + difficultySelect * 100, 400, SDL_Color{ 255, 255, 255, 255 }, ">");
 }
 
 void Graphic::drawDebug(char* debugText[]) {

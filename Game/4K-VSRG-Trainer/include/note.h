@@ -51,6 +51,7 @@ public:
 class KeyLoggerBgm : public KeyLogger<KeySound> {
 public:
 	std::priority_queue<KeySound, std::vector<KeySound>, KeySoundCmp> bgm;
+	void clear();
 };
 
 class JudgeKey : public KeyLogger<JudgeKeySound> {

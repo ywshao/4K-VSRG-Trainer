@@ -5,8 +5,10 @@
 #include <SDL_ttf.h>
 #include "..\..\lib\nfont-master\NFont\NFont_gpu.h"
 #include <string>
+#include <filesystem>
 #include "note.h"
 #include "score.h"
+#include "bms7to4.h"
 
 #define receipterY 600
 #define fontNum 3
@@ -44,5 +46,9 @@ public:
 	void drawErrorMeter(std::list<JudgeErrorTime>::iterator begin, std::list<JudgeErrorTime>::iterator end, int lifeTime, float scale);
 	void drawCombo(char* combo);
 	void drawText();
+	void drawGameType(int gameSelect);
+	void drawBms(std::vector<std::filesystem::path>& bmsDir, int bmsSelect);
+	void drawBmsFile(std::vector<std::vector<std::filesystem::path>>& bmsFileDir, int bmsSelect, int bmsFileSelect);
+	void drawDifficultySelect(PatternParameter& patternParameter, int difficultySelect);
 	void drawDebug(char* debugText[]);
 };
