@@ -267,7 +267,7 @@ void BmsParser::bms7to4(PatternParameter patternParameter) {
 		int totalNoteCount = 0;
 		densityLCM[bar] = std::vector<double>(sizeLCM, 0);
 		densityPreLCM[bar] = std::vector<double>(sizeLCM, 0);
-		chordnessLCM[bar] = std::vector<double>(sizeLCM, 0);printf("Bar %d: ", bar);
+		chordnessLCM[bar] = std::vector<double>(sizeLCM, 0);//printf("Bar %d: ", bar);
 		bool firstNote = true;
 		for (int idx = 0; idx < sizeLCM; idx++) {
 			noteCountCount[noteCount[idx]]++;
@@ -373,7 +373,7 @@ void BmsParser::bms7to4(PatternParameter patternParameter) {
 				break;
 			}
 		}
-		printf("Bar %d\n", bar);
+		//printf("Bar %d\n", bar);
 		int accumulator[maxKeyNum + 1] = {};
 		for (int key = 1; key <= noteCountMax; key++) {
 			accumulator[key] += accumulator[key - 1] + noteCountCount[key];
@@ -448,10 +448,20 @@ void BmsParser::bms7to4(PatternParameter patternParameter) {
 				std::vector<int> possibleKey;
 				int possibleKeyCount = 0;
 				for (int a = 0; a < 4; a++) {
-					if (!preNote4[a] || (preNoteCount4 == 4 && patternParameter.jack) || possibleJack) { // Candidate or Jack
-						if (!preNote4[a] || (preNoteCount4 == 4 && patternParameter.jack) || !prepreNote4[a] || possibleJack && prepreNote4[a] && rand() % 100 < patternParameter.jackLength) { // Candidate or JackLength
-							if (!preNote4[a] || (preNoteCount4 == 4 && patternParameter.jack) || !prepreNote4[a] || !preprepreNote4[a] || possibleJack && prepreNote4[a] && preprepreNote4[a] && rand() % 100 < patternParameter.jackLength) { // Candidate or JackLength
-								if (densityPreLCM[bar][idx - 1 >= 0 ? idx - 1 : idx] * 4 >= densityMedian && densityPreLCM[bar][idx] * 2 >= densityMedian && densityLCM[bar][idx] >= densityMedian && (chordnessLCM[bar][idx] < 1.2 || noteCount[idx] <= 1)) { // Speed
+					if (!preNote4[a] ||
+						(preNoteCount4 == 4 && patternParameter.jack) ||
+						possibleJack) { // Candidate or Jack
+						if (!preNote4[a] ||
+							(preNoteCount4 == 4 && patternParameter.jack) ||
+							!prepreNote4[a] ||
+							possibleJack && prepreNote4[a] && rand() % 100 < patternParameter.jackLength) { // Candidate or JackLength
+							if (!preNote4[a] ||
+								(preNoteCount4 == 4 && patternParameter.jack) ||
+								!prepreNote4[a] ||
+								!preprepreNote4[a] ||
+								possibleJack && prepreNote4[a] && preprepreNote4[a] && rand() % 100 < patternParameter.jackLength) { // Candidate or JackLength
+								if (densityPreLCM[bar][idx - 1 >= 0 ? idx - 1 : idx] * 4 >= densityMedian && densityPreLCM[bar][idx] * 2 >= densityMedian && densityLCM[bar][idx] >= densityMedian && (chordnessLCM[bar][idx] < 1.2 || noteCount[idx] <= 1) ||
+									patternParameter.jump <= 10 && patternParameter.hand <= 10 && patternParameter.quad <= 0) { // Speed
 									//printf("Speed bar: %d %d\n", bar, idx);
 									//printf("Dense Chord: %f %f %f\n", densityPreLCM[bar][idx], densityLCM[bar][idx], chordnessLCM[bar][idx]);
 									if ((!prepreNote4[a] && preprepreNote4[a]) && rand() % 50 < patternParameter.speedTech) { // SpeedTech triplet
@@ -476,13 +486,17 @@ void BmsParser::bms7to4(PatternParameter patternParameter) {
 									}
 								}
 								else {
-									printf("Normal bar: %d %d\n", bar, idx);
-									printf("Dense Chord: %f %f %f\n", densityPreLCM[bar][idx], densityLCM[bar][idx], chordnessLCM[bar][idx]);
+									//printf("Normal bar: %d %d\n", bar, idx);
+									//printf("Dense Chord: %f %f %f\n", densityPreLCM[bar][idx], densityLCM[bar][idx], chordnessLCM[bar][idx]);
 									possibleKey.push_back(a);
 									possibleKeyCount++;
 								}
 							}
 						}
+					}
+					else if (densityLCM[bar][idx] && densityLCM[bar][idx] <= densityMedian * 1.5 && chordnessLCM[bar][idx] * densityMedian >= densityLCM[bar][idx] * 2 && preNoteCount4 >= 2 && maxNote >= 2 && rand() % 100 < patternParameter.tech) {
+						possibleKey.push_back(a);
+						possibleKeyCount++;
 					}
 				}
 				note4Count = 0;
@@ -532,18 +546,16 @@ void BmsParser::bms7to4(PatternParameter patternParameter) {
 }
 
 void BmsParser::clear() {
+	player = 0;
+	bpm = 0;
+	barMax = 0;
 	bpmInt->clear();
 	for (int bar = 0; bar < maxBarNum; bar++) {
-		/*for (std::vector<std::vector<int>>::iterator it = bgm[bar].begin(); it != bgm[bar].end();) {
-			std::vector<std::vector<int>>::iterator itDelete = it;
-			it++;
-			itDelete->clear();
-		}
-		bgm[bar].clear();*/
 		std::vector<std::vector<int>>().swap(bgm[bar]);
 		for (int key = 0; key < maxKeyNum; key++) {
 			note[bar][key].clear();
 		}
+		timeSignature[bar] = 0;
 	}
 	for (int idx = 0; idx < maxIndex; idx++) {
 		bpmInt[idx].clear();

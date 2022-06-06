@@ -76,7 +76,7 @@ private:
 	std::list<KeySound>::iterator keyToLoad[keyNum];
 public:
 	void init(Chart* chart);
-	void update(Audio* audio, Chart* chart, Uint64 chartOffset);
+	void update(Audio* audio, Chart* chart, Uint64 chartOffset, bool changeRate);
 };
 
 class NoteLogger : public KeyLogger<Uint64> {

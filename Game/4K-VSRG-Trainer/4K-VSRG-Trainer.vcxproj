@@ -78,13 +78,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\lib\SDL2-2.0.22\include;$(ProjectDir)..\lib\SDL_gpu-0.12.0\include;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\include;$(ProjectDir)..\lib\portaudio\include;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\include;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\include;$(ProjectDir)..\lib\xgboost\include;$(ProjectDir)..\lib\xgboost\SoundTouch;$(ProjectDir)..\lib\mINI-0.9.13\src;$(ProjectDir)..\..\BMS\BMS-Parser\include;$(ProjectDir)..\..\BMS\BMS7To4\include;$(ProjectDir)include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\SDL2-2.0.22\lib\x64;$(ProjectDir)..\lib\SDL_gpu-0.12.0\lib\Release;$(ProjectDir)..\lib\portaudio\lib;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\lib\x64;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\lib;$(ProjectDir)..\lib\SoundTouch;$(ProjectDir)..\lib\xgboost\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\lib\SDL2-2.0.22\include;$(ProjectDir)..\lib\SDL_gpu-0.12.0\include;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\include;$(ProjectDir)..\lib\portaudio\include;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\include;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\include;$(ProjectDir)..\lib\mINI-0.9.13\src;$(ProjectDir)..\lib\SoundTouch;$(ProjectDir)..\..\BMS\BMS-Parser\include;$(ProjectDir)..\..\BMS\BMS7To4\include;$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\SDL2-2.0.22\lib\x64;$(ProjectDir)..\lib\SDL_gpu-0.12.0\lib\Release;$(ProjectDir)..\lib\portaudio\lib;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\lib\x64;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\lib;$(ProjectDir)..\lib\SoundTouch;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)..\lib\SDL2-2.0.22\include;$(ProjectDir)..\lib\SDL_gpu-0.12.0\include;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\include;$(ProjectDir)..\lib\portaudio\include;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\include;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\include;$(ProjectDir)..\lib\xgboost\include;$(ProjectDir)..\lib\xgboost\SoundTouch;$(ProjectDir)..\lib\mINI-0.9.13\src;$(ProjectDir)..\..\BMS\BMS-Parser\include;$(ProjectDir)..\..\BMS\BMS7To4\include;$(ProjectDir)include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)..\lib\SDL2-2.0.22\lib\x64;$(ProjectDir)..\lib\SDL_gpu-0.12.0\lib\Release;$(ProjectDir)..\lib\portaudio\lib;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\lib\x64;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\lib;$(ProjectDir)..\lib\SoundTouch;$(ProjectDir)..\lib\xgboost\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)..\lib\SDL2-2.0.22\include;$(ProjectDir)..\lib\SDL_gpu-0.12.0\include;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\include;$(ProjectDir)..\lib\portaudio\include;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\include;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\include;$(ProjectDir)..\lib\mINI-0.9.13\src;$(ProjectDir)..\lib\SoundTouch;$(ProjectDir)..\..\BMS\BMS-Parser\include;$(ProjectDir)..\..\BMS\BMS7To4\include;$(ProjectDir)include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)..\lib\SDL2-2.0.22\lib\x64;$(ProjectDir)..\lib\SDL_gpu-0.12.0\lib\Release;$(ProjectDir)..\lib\portaudio\lib;$(ProjectDir)..\lib\SDL2_mixer-2.0.4\lib\x64;$(ProjectDir)..\lib\SDL2_ttf-2.0.18\lib\x64;$(ProjectDir)..\lib\libsndfile-1.1.0-win64\lib;$(ProjectDir)..\lib\SoundTouch;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -125,7 +125,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_gpu.lib;portaudio_x64.lib;SDL2_ttf.lib;sndfile.lib;SoundTouchDLL_x64.lib;xgboost.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_gpu.lib;portaudio_x64.lib;SDL2_ttf.lib;sndfile.lib;SoundTouchDLL_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -139,11 +139,11 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_gpu.lib;portaudio_x64.lib;SDL2_ttf.lib;sndfile.lib;SoundTouchDLL_x64.lib;xgboost.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_gpu.lib;portaudio_x64.lib;SDL2_ttf.lib;sndfile.lib;SoundTouchDLL_x64.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

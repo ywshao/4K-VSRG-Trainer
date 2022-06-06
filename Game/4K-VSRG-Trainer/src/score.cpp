@@ -201,43 +201,94 @@ bool Score::missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisib
 	return flag;
 }
 
-void Score::init() {
+void Score::clearSeg() {
+	for (int judge = 0; judge <= 6; judge++) {
+		judgeCounterSeg[judge] = 0;
+	}
+	scoreV1Seg = 0;
+	scoreV2Seg = 0;
+	judgedNoteCountSeg = 0;
+	notMissCountSeg = 0;
+	comboSeg = 0;
+	meanSeg = 0;
+	M2Seg = 0;
+}
+
+void Score::clearDan() {
+	for (int judge = 0; judge <= 6; judge++) {
+		judgeCounter[judge] = 0;
+	}
 	scoreV1 = 0;
 	scoreV2 = 0;
 	judgedNoteCount = 0;
-	for (int judge = 0; judge < 6; judge++) {
-		judgeCounter[judge] = 0;
-	}
 	notMissCount = 0;
 	combo = 0;
 	mean = 0;
-	variance = 0;
 	M2 = 0;
 }
 
 void Score::updateScore(double difficulty, bool early, Uint64 errorMs, int judgeResult) {
 	scoreV1 += judgeScoreV1(difficulty, errorMs);
+	scoreV1Seg += judgeScoreV1(difficulty, errorMs);
 	scoreV2 += judgeScoreV2(difficulty, errorMs);
+	scoreV2Seg += judgeScoreV2(difficulty, errorMs);
 	judgedNoteCount++;
+	judgedNoteCountSeg++;
 	judgeCounter[judgeResult]++;
+	judgeCounterSeg[judgeResult]++;
+	switch (judgeResult) {
+	case 0:
+		hp += 5;
+		break;
+	case 1:
+		hp += 4;
+		break;
+	case 2:
+		hp += 3;
+		break;
+	case 3:
+		hp -= 10;
+		break;
+	case 4:
+		hp -= 25;
+		break;
+	case 5:
+		hp -= 50;
+		break;
+	}
+	hp = hp > 1000 ? 1000 : hp;
 	notMissCount++;
+	notMissCountSeg++;
 	judgeResult <= 2 ? combo++ : combo = 0;
-	int errorMsSigned = early ? -(int)errorMs : errorMs;
+	judgeResult <= 2 ? comboSeg++ : comboSeg = 0;
+
 	// Welford's online algorithm
+	int errorMsSigned = early ? -(int)errorMs : errorMs;
 	double delta = errorMsSigned - mean;
 	mean += delta / notMissCount;
 	double delta2 = errorMsSigned - mean;
 	M2 += delta * delta2;
+
+	double deltaSeg = errorMsSigned - meanSeg;
+	meanSeg += deltaSeg / notMissCountSeg;
+	double delta2Seg = errorMsSigned - meanSeg;
+	M2Seg += deltaSeg * delta2Seg;
 }
 
 void Score::earlyMiss() {
-	judgeCounter[5]++;
+	judgeCounter[6]++;
+	judgeCounterSeg[6]++;
+	hp -= 10;
 }
 
 void Score::miss() {
 	judgedNoteCount++;
-	judgeCounter[4]++;
+	judgedNoteCountSeg++;
+	judgeCounter[5]++;
+	judgeCounterSeg[5]++;
 	combo = 0;
+	comboSeg = 0;
+	hp -= 50;
 }
 
 double Score::getScoreV1() {
@@ -248,16 +299,36 @@ double Score::getScoreV2() {
 	return judgedNoteCount ? (double)100 * scoreV2 / judgedNoteCount : 0;
 }
 
+double Score::getScoreV1Seg() {
+	return judgedNoteCountSeg ? (double)20 * scoreV1Seg / judgedNoteCountSeg : 0;
+}
+
+double Score::getScoreV2Seg() {
+	return judgedNoteCountSeg ? (double)100 * scoreV2Seg / judgedNoteCountSeg : 0;
+}
+
 double Score::getAvgError() {
 	return mean;
+}
+
+double Score::getAvgErrorSeg() {
+	return meanSeg;
 }
 
 double Score::getVariance() {
 	return notMissCount ? M2 / notMissCount : 0;
 }
 
+double Score::getVarianceSeg() {
+	return notMissCountSeg ? M2Seg / notMissCountSeg : 0;
+}
+
 double Score::getSD() {
 	return sqrt(getVariance());
+}
+
+double Score::getSDSeg() {
+	return sqrt(getVarianceSeg());
 }
 
 int Score::getCombo() {

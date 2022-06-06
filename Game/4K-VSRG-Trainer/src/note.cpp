@@ -129,7 +129,7 @@ void JudgeVisible::update(Uint64 chartOffset) {
 	}
 }
 
-void ChartVisible::update(Audio* audio, Chart* chart, Uint64 chartOffset) {
+void ChartVisible::update(Audio* audio, Chart* chart, Uint64 chartOffset, bool changeRate) {
 	for (int key = 0; key < keyNum; key++) {
 		for (; chart->count(key) && keyToLoad[key] != chart->end(key);) {
 			if (keyToLoad[key]->time + chartOffset <= SDL_GetTicks64() + addNoteMs || !count(key)) {
@@ -153,7 +153,7 @@ void ChartVisible::update(Audio* audio, Chart* chart, Uint64 chartOffset) {
 	}
 	while (!bgm.empty()) {
 		if (bgm.top().time + chartOffset <= SDL_GetTicks64()) {
-			audio->playSound(bgm.top().sound);
+			audio->playSound(changeRate, bgm.top().sound);
 			bgm.pop();
 		}
 		else {

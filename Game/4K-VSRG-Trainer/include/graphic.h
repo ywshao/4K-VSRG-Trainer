@@ -25,7 +25,7 @@ private:
 	TTF_Font* font[fontNum];
 	NFont nfont[fontNum];
 	GPU_Image* note[4];
-	GPU_Image* receipter[4];
+	GPU_Image* receiptor[4];
 	GPU_Image* pressed[4];
 	GPU_Image* judgeNote[7];
 	GPU_Image* judgeKey[7];
@@ -38,7 +38,7 @@ public:
 	void draw();
 
 	void drawNote(ChartVisible& chartVisible, float scrollSpeed, Uint64 chartOffset);
-	void drawReceipter();
+	void drawReceiptor();
 	void drawKeyPressed(bool keyPressed[4]);
 	void drawJudgeNote(JudgeVisible& judgeNoteVisible, Uint64 chartOffset);
 	void drawJudgeKey(JudgeVisible& judgeKeyVisible, Uint64 chartOffset);
@@ -47,8 +47,12 @@ public:
 	void drawCombo(char* combo);
 	void drawText();
 	void drawGameType(int gameSelect);
+	void drawDan(std::vector<std::filesystem::path>& danDir, int danNum, int danSelect);
 	void drawBms(std::vector<std::filesystem::path>& bmsDir, int bmsSelect);
 	void drawBmsFile(std::vector<std::vector<std::filesystem::path>>& bmsFileDir, int bmsSelect, int bmsFileSelect);
 	void drawDifficultySelect(PatternParameter& patternParameter, int difficultySelect);
+	void drawHp(int hp);
+	void drawResult(Score& score);
+	void drawDanResult(Score& score, int danSeg);
 	void drawDebug(char* debugText[]);
 };

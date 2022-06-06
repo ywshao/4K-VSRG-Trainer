@@ -58,12 +58,17 @@ void Audio::portAudioInit(PaDeviceIndex deviceIndex) {
 void Audio::portAudioExit() {
 	PaError err = Pa_Terminate();
 	//printf("Super duper test\n");
-	if (err != paNoError)
-		printf("PortAudio error: %s\n", Pa_GetErrorText(err));
+	//if (err != paNoError)
+		//printf("PortAudio error: %s\n", Pa_GetErrorText(err));
 }
 
-void Audio::playSound(int index) {
-	playingSounds.push_back(PlayingSound(&sound[index]));
+void Audio::playSound(bool changeRate, int index) {
+	if (changeRate) {
+		playingSounds.push_back(PlayingSound(&newSound[index]));
+	}
+	else {
+		playingSounds.push_back(PlayingSound(&sound[index]));
+	}
 }
 
 void Audio::loadSound(int index, const char* path) {
@@ -86,58 +91,175 @@ void Audio::loadSound(int index, const char* path) {
 	//printf("Format: %x\n", sfInfo.format);
 	//printf("%x\n", SF_FORMAT_FLOAT);
 	//printf("%x\n", SF_FORMAT_DOUBLE);
-	if (sfInfo.format & SF_FORMAT_FLOAT || sfInfo.format & SF_FORMAT_DOUBLE) {
+	//if ((sfInfo.format & 0xff) == SF_FORMAT_FLOAT || (sfInfo.format & 0xff) == SF_FORMAT_DOUBLE) {
 		//printf("It's float!\n");
 		sf_count_t count = 0;
 		const int MAX_LEN = 256;
 		float readData[MAX_LEN];
 		while (count = sf_read_float(sndFile, readData, MAX_LEN)) {
 			for (int idx = 0; idx < count;) {
-				if (sfInfo.samplerate == 11025) {
-					sound[index].left.push_back(readData[idx]);
-					sound[index].left.push_back(readData[idx]);
-					sound[index].left.push_back(readData[idx]);
-					sound[index].left.push_back(readData[idx++]);
-					sound[index].right.push_back(readData[idx]);
-					sound[index].right.push_back(readData[idx]);
-					sound[index].right.push_back(readData[idx]);
-					sound[index].right.push_back(readData[idx++]);
-				}
-				else if (sfInfo.samplerate == 22050) {
-					sound[index].left.push_back(readData[idx]);
-					sound[index].left.push_back(readData[idx++]);
-					sound[index].right.push_back(readData[idx]);
-					sound[index].right.push_back(readData[idx++]);
-				}
-				else if (sfInfo.samplerate == 44100 && sfInfo.channels == 2) {
+				if (sfInfo.channels == 2) {
 					sound[index].left.push_back(readData[idx++]);
 					sound[index].right.push_back(readData[idx++]);
 				}
-				else if (sfInfo.samplerate == 44100 && sfInfo.channels == 1) {
+				else if (sfInfo.channels == 1) {
 					sound[index].left.push_back(readData[idx]);
 					sound[index].right.push_back(readData[idx++]);
 				}
 			}
 		}
-	}
-	else if (sfInfo.format & SF_FORMAT_OGG && (sfInfo.format % 0x10000) & SF_FORMAT_VORBIS) {
-		//printf("It's OGG!\n");
+	/* }
+	else if ((sfInfo.format & 0xff) == SF_FORMAT_PCM_U8) {
+		printf("It's uint!\n");
 		sf_count_t count = 0;
 		const int MAX_LEN = 256;
-		double readData[MAX_LEN];
-		while (count = sf_read_double(sndFile, readData, MAX_LEN)) {
+		float readData[MAX_LEN];
+		while (count = sf_read_float(sndFile, readData, MAX_LEN)) {
 			for (int idx = 0; idx < count;) {
-				sound[index].left.push_back(readData[idx++]);
-				sound[index].right.push_back(readData[idx++]);
+				if (sfInfo.channels == 2) {
+					sound[index].left.push_back((double)(readData[idx++] - 128) / 128);
+					sound[index].right.push_back((double)(readData[idx++] - 128) / 128);
+				}
+				else if (sfInfo.channels == 1) {
+					sound[index].left.push_back((double)(readData[idx] - 128) / 128);
+					sound[index].right.push_back((double)(readData[idx++] - 128) / 128);
+				}
 			}
 		}
 	}
+	else if ((sfInfo.format & 0xff) == SF_FORMAT_OGG && (sfInfo.format % 0x10000) == SF_FORMAT_VORBIS) {
+		printf("It's OGG!\n");
+		sf_count_t count = 0;
+		const int MAX_LEN = 256;
+		float readData[MAX_LEN];
+		while (count = sf_read_float(sndFile, readData, MAX_LEN)) {
+			for (int idx = 0; idx < count;) {
+				if (sfInfo.channels == 2) {
+					sound[index].left.push_back((double)(readData[idx++] - 128) / 128);
+					sound[index].right.push_back((double)(readData[idx++] - 128) / 128);
+				}
+				else if (sfInfo.channels == 1) {
+					sound[index].left.push_back((double)(readData[idx] - 128) / 128);
+					sound[index].right.push_back((double)(readData[idx++] - 128) / 128);
+				}
+			}
+		}
+	}*/
 	sf_close(sndFile);
+	if (sfInfo.samplerate != 44100) {
+		resample(index, sfInfo.samplerate);
+	}
+}
+
+void Audio::resample(int index, int sampleRate) {
+	if (sound[index].left.size() > 1) {
+		HANDLE hLeft = soundtouch_createInstance();
+		soundtouch_setChannels(hLeft, 1);
+		soundtouch_setSampleRate(hLeft, 44100);
+		soundtouch_setRate(hLeft, (float)sampleRate / 44100);
+		float* soundLeft = new float[sound[index].left.size()];
+		std::copy(sound[index].left.begin(), sound[index].left.end(), soundLeft);
+		soundtouch_putSamples(hLeft, soundLeft, sound[index].left.size());
+		int newSize = (int)((float)sound[index].left.size() * 44100 / sampleRate);
+		float* newSoundLeft = new float[newSize];
+		std::fill(newSoundLeft, newSoundLeft + newSize, 0);
+		soundtouch_receiveSamples(hLeft, newSoundLeft, newSize);
+		soundtouch_destroyInstance(hLeft);
+		sound[index].left = std::vector<float>(newSoundLeft, newSoundLeft + newSize);
+		delete[] soundLeft;
+		delete[] newSoundLeft;
+	}
+	else {
+		sound[index].left.push_back(0);
+	}
+	if (sound[index].right.size() > 1) {
+		HANDLE hRight = soundtouch_createInstance();
+		soundtouch_setChannels(hRight, 1);
+		soundtouch_setSampleRate(hRight, 44100);
+		soundtouch_setRate(hRight, (float)sampleRate / 44100);
+		float* soundRight = new float[sound[index].right.size()];
+		std::copy(sound[index].right.begin(), sound[index].right.end(), soundRight);
+		soundtouch_putSamples(hRight, soundRight, sound[index].right.size());
+		int newSize = (int)((float)sound[index].right.size() * 44100 / sampleRate);
+		float* newSoundRight = new float[newSize];
+		std::fill(newSoundRight, newSoundRight + newSize, 0);
+		soundtouch_receiveSamples(hRight, newSoundRight, newSize);
+		soundtouch_destroyInstance(hRight);
+		sound[index].right = std::vector<float>(newSoundRight, newSoundRight + newSize);
+		delete[] soundRight;
+		delete[] newSoundRight;
+	}
+	else {
+		sound[index].right.push_back(0);
+	}
+}
+
+void Audio::changeRate(bool wsola, int rate, int index) {
+	if (sound[index].left.size() > 1) {
+		HANDLE hLeft = soundtouch_createInstance();
+		soundtouch_setChannels(hLeft, 1);
+		soundtouch_setSampleRate(hLeft, 44100);
+		if (wsola) {
+			soundtouch_setTempo(hLeft, (float)rate / 100);
+			//soundtouch_setTempoChange(hLeft, ((float)rate - 100) / 100);
+		}
+		else {
+			soundtouch_setRate(hLeft, (float)rate / 100);
+			//soundtouch_setRateChange(hLeft, ((float)rate - 100) / 100);
+		}
+		float* soundLeft = new float[sound[index].left.size()];
+		std::copy(sound[index].left.begin(), sound[index].left.end(), soundLeft);
+		soundtouch_putSamples(hLeft, soundLeft, sound[index].left.size());
+		int newSize = (int)((float)sound[index].left.size() * 100 / rate);
+		float* newSoundLeft = new float[newSize];
+		std::fill(newSoundLeft, newSoundLeft + newSize, 0);
+		soundtouch_receiveSamples(hLeft, newSoundLeft, newSize);
+		soundtouch_destroyInstance(hLeft);
+		newSound[index].left = std::vector<float>(newSoundLeft, newSoundLeft + newSize);
+		delete [] soundLeft;
+		delete [] newSoundLeft;
+	}
+	else {
+		newSound[index].left.push_back(0);
+	}
+	if (sound[index].right.size() > 1) {
+		HANDLE hRight = soundtouch_createInstance();
+		soundtouch_setChannels(hRight, 1);
+		soundtouch_setSampleRate(hRight, 44100);
+		if (wsola) {
+			soundtouch_setTempo(hRight, (float)rate / 100);
+			//soundtouch_setTempoChange(hRight, ((float)rate - 100) / 100);
+		}
+		else {
+			soundtouch_setRate(hRight, (float)rate / 100);
+			//soundtouch_setRateChange(hRight, ((float)rate - 100) / 100);
+		}
+		float* soundRight = new float[sound[index].right.size()];
+		std::copy(sound[index].right.begin(), sound[index].right.end(), soundRight);
+		soundtouch_putSamples(hRight, soundRight, sound[index].right.size());
+		int newSize = (int)((float)sound[index].right.size() * 100 / rate);
+		float* newSoundRight = new float[newSize];
+		std::fill(newSoundRight, newSoundRight + newSize, 0);
+		soundtouch_receiveSamples(hRight, newSoundRight, newSize);
+		soundtouch_destroyInstance(hRight);
+		newSound[index].right = std::vector<float>(newSoundRight, newSoundRight + newSize);
+		delete [] soundRight;
+		delete [] newSoundRight;
+	}
+	else {
+		newSound[index].right.push_back(0);
+	}
 }
 
 void Audio::offloadSound(int index) {
-	sound[index].left.clear();
-	sound[index].right.clear();
+	sound[index].left = std::vector<float>();
+	sound[index].right = std::vector<float>();
+	offloadNewSound(index);
+}
+
+void Audio::offloadNewSound(int index) {
+	newSound[index].left = std::vector<float>();
+	newSound[index].right = std::vector<float>();
 }
 
 void Audio::stopSound() {

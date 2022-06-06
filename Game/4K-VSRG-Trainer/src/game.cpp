@@ -1,56 +1,51 @@
 #include "game.h"
 
-void Game::bmsInit() {
+void Game::bmsInit(bool dan) {
 	audio.portAudioExit();
 	audio.portAudioInit(audioDeviceIndex);
-	score.init();
-	static PatternParameter previousPatternParameter = {};
 	static std::filesystem::path previousFilePath = {};
-	std::filesystem::path dirPath = bmsPath / bmsDir[bmsSelect];
-	std::filesystem::path filePath = dirPath / bmsFileDir[bmsSelect][bmsFileSelect];
-	printf("%s\n", filePath.string().c_str());
+	std::filesystem::path dirPath = dan ? bmsPath / danDirPath : bmsPath / bmsDir[bmsSelect];
+	std::filesystem::path filePath = dan ? dirPath / danFilePath : dirPath / bmsFileDir[bmsSelect][bmsFileSelect];
+	//printf("BMSInit: %s\n", filePath.string().c_str());
 	if (previousFilePath != filePath) {
 		previousFilePath = filePath;
 		bmsParser.clear();
 		bmsParser.parseFile(filePath.string().c_str());
 		bmsParser.bms7to4(patternParameter);
-		std::vector<std::thread> threadLoadWav;
-		printf("Audio before\n");
+		//std::vector<std::thread> threadLoadWav;
+		//printf("Audio before\n");
 		for (int wav = 0; wav < 1536; wav++) {
 			audio.offloadSound(wav);
 			if (!bmsParser.wav[wav].empty()) {
-				threadLoadWav.push_back(std::thread([=] {audio.loadSound(wav, (dirPath / std::filesystem::path(bmsParser.wav[wav])).string().c_str()); }));
+				//threadLoadWav.push_back(std::thread([=] {audio.loadSound(wav, (dirPath / std::filesystem::path(bmsParser.wav[wav])).string().c_str()); }));
+				audio.loadSound(wav, (dirPath / std::filesystem::path(bmsParser.wav[wav])).string().c_str());
 			}
 			else {
 				audio.loadSound(wav, "0");
 			}
-		}
+		}/*
 		for (auto wav = threadLoadWav.begin(); wav != threadLoadWav.end(); wav++) {
 			wav->join();
-		}
-		printf("Audio added\n");
+		}*/
+		//printf("Audio added\n");
 	}
 	else {
-		bool same = true;
-		for (int idx = 0; idx < 8; idx++) {
-			if (previousPatternParameter.access[idx] != patternParameter.access[idx]) {
-				same = false;
-				break;
-			}
-		}
-		if (!same) {
-			bmsParser.clear();
-			bmsParser.parseFile(filePath.string().c_str());
-			bmsParser.bms7to4(patternParameter);
+		bmsParser.clear();
+		bmsParser.parseFile(filePath.string().c_str());
+		bmsParser.bms7to4(patternParameter);
+	}
+	if (patternParameter.rate != 100) {
+		for (int wav = 0; wav < 1536; wav++) {
+			audio.offloadNewSound(wav);
+			audio.changeRate(wsola, patternParameter.rate, wav);
 		}
 	}
-	previousPatternParameter = patternParameter;
 	double offset = SDL_GetTicks64();
-	double currentBpm = bmsParser.bpm;
+	double currentBpm = bmsParser.bpm * patternParameter.rate / 100;
 	for (int bar = 0; bar <= bmsParser.barMax; bar++) {
 		double barLength;
 		if (!bmsParser.bpmInt[bar].empty()) { // Test
-			currentBpm = bmsParser.bpmInt[bar][0];
+			currentBpm = bmsParser.bpmInt[bar][0] * patternParameter.rate / 100;
 		}
 		barLength = (double)4 / currentBpm * 60000;
 		barLength = bmsParser.timeSignature[bar] ? barLength * bmsParser.timeSignature[bar] : barLength;
@@ -92,7 +87,7 @@ void Game::patternParameterWrite(std::string iniPath) {
 	ini["PatternParameter"]["jump"] = std::to_string(patternParameter.jump);
 	ini["PatternParameter"]["hand"] = std::to_string(patternParameter.hand);
 	ini["PatternParameter"]["quad"] = std::to_string(patternParameter.quad);
-	ini["PatternParameter"]["delay"] = std::to_string(patternParameter.delay);
+	ini["PatternParameter"]["tech"] = std::to_string(patternParameter.tech);
 	//iniFile.write(ini);
 	iniFile.generate(ini);
 	
@@ -163,10 +158,19 @@ void Game::init() {
 	errorMeter.setScale(stof(iniGlobal["ErrorMeter"]["scale"]));
 	scrollSpeed = stof(iniGlobal["ScrollSpeed"]["speed"]);
 	//
-	printf("Path:\n");
+	//printf("Path:\n");
 	bmsPath = iniGlobal["BMSPath"]["directory"];
+	int counter = 0;
 	for (auto const& dir_entry : std::filesystem::directory_iterator{ bmsPath }) {
 		if (dir_entry.is_directory()) {
+			if (dir_entry.path().filename().string() == std::string("dan")) {
+				danFile = counter;
+				for (auto const& file_entry : std::filesystem::directory_iterator{ dir_entry }) {
+					if (file_entry.is_regular_file() && file_entry.path().filename().extension().string() == std::string(".ini")) {
+						danDir.push_back(file_entry.path().filename());
+					}
+				}
+			}
 			bmsDir.push_back(dir_entry.path().filename());
 			std::vector<std::filesystem::path> bmsVarient;
 			for (auto const& file_entry : std::filesystem::directory_iterator{ dir_entry }) {
@@ -175,14 +179,17 @@ void Game::init() {
 					file_entry.path().filename().extension().string() == std::string(".bme") ||
 					file_entry.path().filename().extension().string() == std::string(".bml") ||
 					file_entry.path().filename().extension().string() == std::string(".bm4"))) {
-					printf("%s\n", file_entry.path().filename().string().c_str());
+					//printf("%s\n", file_entry.path().filename().string().c_str());
 					bmsVarient.push_back(file_entry.path().filename());
 				}
 			}
-			printf("%s\n", dir_entry.path().filename().string().c_str());
+			//printf("%s\n", dir_entry.path().filename().string().c_str());
 			bmsFileDir.push_back(bmsVarient);
+			counter++;
 		}
 	}
+	wsola = stoi(iniGlobal["WSOLA"]["enable"]);
+	debug = stoi(iniGlobal["Debug"]["enable"]);
 	chartOffset = 3000;
 	gameState = GameState::SelectGame;
 	patternParameter.rate = 100;
@@ -260,6 +267,52 @@ void Game::update() {
 		graphic.drawGameType(gameSelect);
 		break;
 	}
+	case GameState::SelectDan:
+	{
+		const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
+		if (keyTrigger) {
+			if (keyPressed[4]) { // Esc
+				gameState = GameState::SelectGame;
+			}
+			else if (keyPressed[5] || keyPressed[6]) { // Enter
+				gameState = GameState::PlayDan;
+				mINI::INIFile iniFile(bmsPath.string() + std::string("/dan/") + danDir[danSelect].string());
+				mINI::INIStructure ini;
+				if (iniFile.read(ini)) {
+					danDirPath = ini["PatternParameter1"]["dirPath"];
+					danFilePath = ini["PatternParameter1"]["filePath"];
+					patternParameter.rate = stoi(ini["PatternParameter1"]["rate"]);
+					patternParameter.jack = stoi(ini["PatternParameter1"]["jack"]);
+					patternParameter.jackLength = stoi(ini["PatternParameter1"]["jackLength"]);
+					patternParameter.speedTech = stoi(ini["PatternParameter1"]["speedTech"]);
+					patternParameter.jump = stoi(ini["PatternParameter1"]["jump"]);
+					patternParameter.hand = stoi(ini["PatternParameter1"]["hand"]);
+					patternParameter.quad = stoi(ini["PatternParameter1"]["quad"]);
+					patternParameter.tech = stoi(ini["PatternParameter1"]["tech"]);
+				}
+				//printf("%s\n", danDirPath.string().c_str());
+				//printf("%s\n", danFilePath.string().c_str());
+				//printf("BMSInit: Select Dan\n");
+				bmsInit(true);
+				score.hp = 500;
+				danSeg = 0;
+				score.clearSeg();
+				score.clearDan();
+			}
+			else if (keyPressed[7]) { // Up
+				danSelect = (danDir.size() + danSelect - 1) % danDir.size();
+			}
+			else if (keyPressed[8]) { // Left
+			}
+			else if (keyPressed[9]) { // Down
+				danSelect = (danDir.size() + danSelect + 1) % danDir.size();
+			}
+			else if (keyPressed[10]) { // Right
+			}
+		}
+		graphic.drawDan(danDir, danFile, danSelect);
+		break;
+	}
 	case GameState::SelectBms:
 	{
 		const Uint8* keyboardState = SDL_GetKeyboardState(NULL);
@@ -308,7 +361,7 @@ void Game::update() {
 					patternParameter.jump = stoi(ini["PatternParameter"]["jump"]);
 					patternParameter.hand = stoi(ini["PatternParameter"]["hand"]);
 					patternParameter.quad = stoi(ini["PatternParameter"]["quad"]);
-					patternParameter.delay = stoi(ini["PatternParameter"]["delay"]);
+					patternParameter.tech = stoi(ini["PatternParameter"]["tech"]);
 				}
 			}
 			else if (keyPressed[7]) { // Up
@@ -341,7 +394,11 @@ void Game::update() {
 				std::filesystem::path iniPath = bmsPath / bmsDir[bmsSelect] / bmsFileDir[bmsSelect][bmsFileSelect];
 				iniPath += std::string(".ini");
 				patternParameterWrite(iniPath.string());
-				bmsInit();
+				//printf("BMSInit: Select Difficulty\n");
+				bmsInit(false);
+				score.hp = 500;
+				score.clearSeg();
+				score.clearDan();
 			}
 			else if (keyPressed[7]) { // Up
 				int idx = difficultySelect;
@@ -349,7 +406,7 @@ void Game::update() {
 					patternParameter.access[idx] = patternParameter.access[idx] < 100 ? patternParameter.access[idx] + 1 : patternParameter.access[idx];
 				}
 				else {
-					patternParameter.access[idx] = patternParameter.access[idx] < 800 ? patternParameter.access[idx] + 1 : patternParameter.access[idx];
+					patternParameter.access[idx] = patternParameter.access[idx] < 200 ? patternParameter.access[idx] + 1 : patternParameter.access[idx];
 				}
 			}
 			else if (keyPressed[8]) { // Left
@@ -361,7 +418,7 @@ void Game::update() {
 					patternParameter.access[idx] = patternParameter.access[idx] > 0 ? patternParameter.access[idx] - 1 : patternParameter.access[idx];
 				}
 				else {
-					patternParameter.access[idx] = patternParameter.access[idx] > 20 ? patternParameter.access[idx] - 1 : patternParameter.access[idx];
+					patternParameter.access[idx] = patternParameter.access[idx] > 50 ? patternParameter.access[idx] - 1 : patternParameter.access[idx];
 				}
 			}
 			else if (keyPressed[10]) { // Right
@@ -372,6 +429,7 @@ void Game::update() {
 		break;
 	}
 	case GameState::Play:
+	case GameState::PlayDan:
 	{
 		// Key
 		static JudgeKeySound judgeKeySound({ 0, 0 }, 6);
@@ -384,7 +442,7 @@ void Game::update() {
 				if (!keyPressed[key]) {
 					judgeKeySound = score.judger(1/*Test*/, key, chartVisible, judgeNoteVisible, errorMeter, chartOffset);
 					if (judgeKeySound.sound) {
-						audio.playSound(judgeKeySound.sound);
+						audio.playSound(patternParameter.rate != 100, judgeKeySound.sound);
 					}
 					judgeKeyVisible.add(key, judgeKeySound);
 					judgeKey.add(key, judgeKeySound);
@@ -397,20 +455,36 @@ void Game::update() {
 		}
 		if (keyTrigger) {
 			if (keyPressed[4]) { // Esc
-				gameState = GameState::SelectDifficulty;
+				if (gameState == GameState::Play) {
+					gameState = GameState::SelectDifficulty;
+				}
+				else {
+					gameState = GameState::SelectDan;
+				}
 				chart.clear();
 				chartVisible.clear();
 				judgeKey.clear();
 				audio.portAudioExit();
 				audio.stopSound();
+				break;
 			}
 		}
 		judgeNoteVisible.update(chartOffset);
 		judgeKeyVisible.update(chartOffset);
-		chartVisible.update(&audio, &chart, chartOffset);
+		chartVisible.update(&audio, &chart, chartOffset, patternParameter.rate != 100);
 		errorMeter.update();
 
-		graphic.drawReceipter();
+		if (!chartVisible.count() || score.hp <= 0) { // Chart end or hp == 0
+			//printf("%d %d\n", chartVisible.count(), score.hp);
+			if (gameState == GameState::Play) {
+				gameState = GameState::Result;
+			}
+			else {
+				gameState = GameState::ResultDan;
+			}
+		}
+
+		graphic.drawReceiptor();
 		graphic.drawKeyPressed(keyPressed);
 		graphic.drawNote(chartVisible, scrollSpeed, chartOffset);
 		graphic.drawJudgeNote(judgeNoteVisible, chartOffset);
@@ -420,40 +494,133 @@ void Game::update() {
 		char combo[32];
 		sprintf(combo, "%d", score.getCombo());
 		graphic.drawCombo(combo);
-		graphic.drawText();
-		// Debug info
-		char fpsBuffer[32] = {};
-		sprintf(fpsBuffer, "FPS: %d", fps.get());
-		char sizeBuffer[32] = {};
-		sprintf(sizeBuffer, "Sound num: %d", audio.getCurrentSoundNum());
-		char keyCountBufffer[32] = {};
-		sprintf(keyCountBufffer, "Key pressed: %d", judgeKey.count());
-		char chartVisibleBufffer[32] = {};
-		sprintf(chartVisibleBufffer, "Visible note: %d", chartVisible.count());
-		char chartBufffer[32] = {};
-		sprintf(chartBufffer, "Chart note: %d", chart.count());
-		char scoreV1Bufffer[32] = {};
-		sprintf(scoreV1Bufffer, "ScoreV1: %.4f", score.getScoreV1());
-		char scoreV2Bufffer[32] = {};
-		sprintf(scoreV2Bufffer, "ScoreV2: %.4f", score.getScoreV2());
-		char avgErrorBufffer[32] = {};
-		sprintf(avgErrorBufffer, "AvgError: %.4f", score.getAvgError());
-		char varianceBufffer[32] = {};
-		sprintf(varianceBufffer, "Variance: %.4f", score.getVariance());
-		char SDBufffer[32] = {};
-		sprintf(SDBufffer, "SD: %.4f", score.getSD());
-		char* debugText[12] = { fpsBuffer,
-			sizeBuffer,
-			keyCountBufffer,
-			chartVisibleBufffer,
-			chartBufffer,
-			scoreV1Bufffer,
-			scoreV2Bufffer,
-			avgErrorBufffer,
-			varianceBufffer,
-			SDBufffer
-		};
-		graphic.drawDebug(debugText);
+		//graphic.drawText();
+		graphic.drawHp(score.hp);
+		if (debug) {
+			// Debug info
+			char fpsBuffer[32] = {};
+			sprintf(fpsBuffer, "FPS: %d", fps.get());
+			char sizeBuffer[32] = {};
+			sprintf(sizeBuffer, "Sound num: %d", audio.getCurrentSoundNum());
+			char keyCountBufffer[32] = {};
+			sprintf(keyCountBufffer, "Key pressed: %d", judgeKey.count());
+			char chartVisibleBufffer[32] = {};
+			sprintf(chartVisibleBufffer, "Visible note: %d", chartVisible.count());
+			char chartBufffer[32] = {};
+			sprintf(chartBufffer, "Chart note: %d", chart.count());
+			char scoreV1Bufffer[32] = {};
+			sprintf(scoreV1Bufffer, "ScoreV1: %.4f", score.getScoreV1());
+			char scoreV2Bufffer[32] = {};
+			sprintf(scoreV2Bufffer, "ScoreV2: %.4f", score.getScoreV2());
+			char avgErrorBufffer[32] = {};
+			sprintf(avgErrorBufffer, "AvgError: %.4f", score.getAvgError());
+			char varianceBufffer[32] = {};
+			sprintf(varianceBufffer, "Variance: %.4f", score.getVariance());
+			char SDBufffer[32] = {};
+			sprintf(SDBufffer, "SD: %.4f", score.getSD());
+			char KPSBuffer[32] = {};
+			sprintf(KPSBuffer, "KPS: %.1f", (float)judgeKeyVisible.count() / 2);
+			char* debugText[12] = {
+				fpsBuffer,
+				sizeBuffer,
+				keyCountBufffer,
+				chartVisibleBufffer,
+				chartBufffer,
+				scoreV1Bufffer,
+				scoreV2Bufffer,
+				avgErrorBufffer,
+				varianceBufffer,
+				SDBufffer,
+				KPSBuffer
+			};
+			graphic.drawDebug(debugText);
+		}
+		else {
+			char fpsBuffer[32] = {};
+			sprintf(fpsBuffer, "FPS: %d", fps.get());
+			char scoreV1Bufffer[32] = {};
+			sprintf(scoreV1Bufffer, "ScoreV1: %.4f", score.getScoreV1());
+			char scoreV2Bufffer[32] = {};
+			sprintf(scoreV2Bufffer, "ScoreV2: %.4f", score.getScoreV2());
+			char avgErrorBufffer[32] = {};
+			sprintf(avgErrorBufffer, "AvgErr: %.4f", score.getAvgErrorSeg());
+			char varianceBufffer[32] = {};
+			sprintf(varianceBufffer, "Var: %.4f", score.getVarianceSeg());
+			char SDBufffer[32] = {};
+			sprintf(SDBufffer, "SD: %.4f", score.getSDSeg());
+			char KPSBuffer[32] = {};
+			sprintf(KPSBuffer, "KPS: %.1f", (float)judgeKeyVisible.count() / 2);
+			char* debugText[8] = {
+				fpsBuffer,
+				scoreV1Bufffer,
+				scoreV2Bufffer,
+				avgErrorBufffer,
+				varianceBufffer,
+				SDBufffer,
+				KPSBuffer
+			};
+			graphic.drawDebug(debugText);
+		}
+		break;
+	}
+	case GameState::Result:
+	case GameState::ResultDan:
+	{
+		if (keyTrigger) {
+			if (keyPressed[4] || keyPressed[5] || keyPressed[6]) { // Esc or enter
+				chart.clear();
+				chartVisible.clear();
+				judgeKey.clear();
+				audio.portAudioExit();
+				audio.stopSound();
+				score.clearSeg();
+				if (gameState == GameState::Result) {
+					gameState = GameState::SelectFile;
+				}
+				else {
+					if (++danSeg < 4 && score.hp > 0) {
+						//printf("DanSeg: %d\n", danSeg);
+						gameState = GameState::PlayDan;
+						mINI::INIFile iniFile(bmsPath.string() + std::string("/dan/") + danDir[danSelect].string());
+						mINI::INIStructure ini;
+						char PatternParameterName[32];
+						if (danSeg == 1) {
+							strcpy(PatternParameterName, "PatternParameter2");
+						}
+						else if (danSeg == 2) {
+							strcpy(PatternParameterName, "PatternParameter3");
+						}
+						else if (danSeg == 3) {
+							strcpy(PatternParameterName, "PatternParameter4");
+						}
+						if (iniFile.read(ini)) {
+							danDirPath = ini[PatternParameterName]["dirPath"];
+							danFilePath = ini[PatternParameterName]["filePath"];
+							patternParameter.rate = stoi(ini[PatternParameterName]["rate"]);
+							patternParameter.jack = stoi(ini[PatternParameterName]["jack"]);
+							patternParameter.jackLength = stoi(ini[PatternParameterName]["jackLength"]);
+							patternParameter.speedTech = stoi(ini[PatternParameterName]["speedTech"]);
+							patternParameter.jump = stoi(ini[PatternParameterName]["jump"]);
+							patternParameter.hand = stoi(ini[PatternParameterName]["hand"]);
+							patternParameter.quad = stoi(ini[PatternParameterName]["quad"]);
+							patternParameter.tech = stoi(ini[PatternParameterName]["tech"]);
+						}
+						//printf("BMSInit: In Dan\n");
+						bmsInit(true);
+					}
+					else {
+						//printf("HP: %d\n", score.hp);
+						//printf("DanSeg: %d\n", danSeg);
+						gameState = GameState::SelectDan;
+						score.clearDan();
+					}
+				}
+			}
+		}
+		graphic.drawResult(score);
+		if (gameState == GameState::ResultDan) {
+			graphic.drawDanResult(score, danSeg);
+		}
 		break;
 	}
 	}

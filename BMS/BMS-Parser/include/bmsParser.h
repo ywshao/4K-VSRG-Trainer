@@ -27,7 +27,7 @@ union PatternParameter {
 		int jump;
 		int hand;
 		int quad;
-		int delay;
+		int tech;
 	};
 	int access[8];
 };

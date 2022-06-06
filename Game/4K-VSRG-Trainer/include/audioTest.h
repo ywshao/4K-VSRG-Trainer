@@ -2,6 +2,7 @@
 
 #include <portaudio.h>	// Have the ability to select low-latency driver
 #include <sndfile.h>
+#include <SoundTouchDLL.h>
 #include <vector>
 #include <list>
 
@@ -31,12 +32,16 @@ private:
 	const int framesPerBuffer = 256;
 	std::list<PlayingSound> playingSounds;
 	Sound sound[maxSound];
+	Sound newSound[maxSound];
 public:
 	void portAudioInit(PaDeviceIndex device);
 	void portAudioExit();
-	void playSound(int index);
+	void playSound(bool changeRate, int index);
 	void loadSound(int index, const char *path);
+	void resample(int index, int sampleRate);
+	void changeRate(bool wsola, int rate, int index);
 	void offloadSound(int index);
+	void offloadNewSound(int index);
 	void stopSound();
 	int getCurrentSoundNum();
 };

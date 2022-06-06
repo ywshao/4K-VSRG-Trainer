@@ -44,24 +44,38 @@ private:
 	void miss();
 	//
 	int scoreV1;
+	int scoreV1Seg;
 	double scoreV2;
+	double scoreV2Seg;
 	int judgedNoteCount;
-	int judgeCounter[6];
+	int judgedNoteCountSeg;
 	int notMissCount;
+	int notMissCountSeg;
 	int combo;
+	int comboSeg;
 	double mean;
-	double variance;
+	double meanSeg;
 	double M2;
+	double M2Seg;
 public:
+	int hp;
+	int judgeCounter[7];
+	int judgeCounterSeg[7];
 	JudgeKeySound judger(double difficulty, int key, ChartVisible &chartVisible, JudgeVisible& judgeNoteVisible, ErrorMeter& errorMeter, Uint64 chartOffset);
 	bool missJudger(double difficulty, ChartVisible& chartVisible, JudgeVisible& judgeNoteVisible, Uint64 chartOffset);
 
-	void init();
+	void clearSeg();
+	void clearDan();
 
 	double getScoreV1();
 	double getScoreV2();
+	double getScoreV1Seg();
+	double getScoreV2Seg();
 	double getAvgError();
+	double getAvgErrorSeg();
 	double getVariance();
+	double getVarianceSeg();
 	double getSD();
+	double getSDSeg();
 	int getCombo();
 };

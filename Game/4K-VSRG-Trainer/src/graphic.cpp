@@ -17,10 +17,10 @@ void Graphic::init(std::string texturePath, mINI::INIStructure& iniTexture) {
 	note[1] = GPU_LoadImage((texturePath + iniTexture["Texture"]["note2"]).c_str());
 	note[2] = GPU_LoadImage((texturePath + iniTexture["Texture"]["note3"]).c_str());
 	note[3] = GPU_LoadImage((texturePath + iniTexture["Texture"]["note4"]).c_str());
-	receipter[0] = GPU_LoadImage((texturePath + iniTexture["Texture"]["receipter1"]).c_str());
-	receipter[1] = GPU_LoadImage((texturePath + iniTexture["Texture"]["receipter2"]).c_str());
-	receipter[2] = GPU_LoadImage((texturePath + iniTexture["Texture"]["receipter3"]).c_str());
-	receipter[3] = GPU_LoadImage((texturePath + iniTexture["Texture"]["receipter4"]).c_str());
+	receiptor[0] = GPU_LoadImage((texturePath + iniTexture["Texture"]["receiptor1"]).c_str());
+	receiptor[1] = GPU_LoadImage((texturePath + iniTexture["Texture"]["receiptor2"]).c_str());
+	receiptor[2] = GPU_LoadImage((texturePath + iniTexture["Texture"]["receiptor3"]).c_str());
+	receiptor[3] = GPU_LoadImage((texturePath + iniTexture["Texture"]["receiptor4"]).c_str());
 	pressed[0] = GPU_LoadImage((texturePath + iniTexture["Texture"]["pressed1"]).c_str());
 	pressed[1] = GPU_LoadImage((texturePath + iniTexture["Texture"]["pressed2"]).c_str());
 	pressed[2] = GPU_LoadImage((texturePath + iniTexture["Texture"]["pressed3"]).c_str());
@@ -81,11 +81,11 @@ void Graphic::drawNote(ChartVisible &chartVisible, float scrollSpeed, Uint64 cha
 	GPU_Blit(note[3], NULL, window, 500, (SDL_GetTicks64() + 600) % 800);*/
 }
 
-void Graphic::drawReceipter() {
-	GPU_Blit(receipter[0], NULL, window, 300, receipterY);
-	GPU_Blit(receipter[1], NULL, window, 400, receipterY);
-	GPU_Blit(receipter[2], NULL, window, 500, receipterY);
-	GPU_Blit(receipter[3], NULL, window, 600, receipterY);
+void Graphic::drawReceiptor() {
+	GPU_Blit(receiptor[0], NULL, window, 300, receipterY);
+	GPU_Blit(receiptor[1], NULL, window, 400, receipterY);
+	GPU_Blit(receiptor[2], NULL, window, 500, receipterY);
+	GPU_Blit(receiptor[3], NULL, window, 600, receipterY);
 }
 
 void Graphic::drawKeyPressed(bool keyPressed[4]) {
@@ -165,6 +165,13 @@ void Graphic::drawGameType(int gameSelect) {
 	nfont[FONT_REGULAR].draw(window, 60, 350, SDL_Color{ 255, 255, 255, 255 }, ">");
 }
 
+void Graphic::drawDan(std::vector<std::filesystem::path>& danDir, int danNum, int danSelect) {
+	for (int idx = -7; idx <= 7; idx++) {
+		nfont[FONT_REGULAR].draw(window, 100, (idx + 7) * 50, SDL_Color{ 255, 255, 255, 255 }, danDir[(idx + danSelect + danDir.size() * 7) % danDir.size()].string().c_str());
+	}
+	nfont[FONT_REGULAR].draw(window, 60, 350, SDL_Color{ 255, 255, 255, 255 }, ">");
+}
+
 void Graphic::drawBms(std::vector<std::filesystem::path>& bmsDir, int bmsSelect) {
 	for (int idx = -7; idx <= 7; idx++) {
 		nfont[FONT_REGULAR].draw(window, 100, (idx + 7) * 50, SDL_Color{ 255, 255, 255, 255 }, bmsDir[(idx + bmsSelect + bmsDir.size() * 7) % bmsDir.size()].string().c_str());
@@ -212,15 +219,108 @@ void Graphic::drawDifficultySelect(PatternParameter& patternParameter, int diffi
 	nfont[FONT_REGULAR].draw(window, 800, 250, SDL_Color{ 255, 255, 255, 255 }, "Quad");
 	nfont[FONT_REGULAR].draw(window, 800, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
 	nfont[FONT_REGULAR].draw(window, 850, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
-	sprintf(buffer, "%.2f", (float)patternParameter.delay / 100);
-	nfont[FONT_REGULAR].draw(window, 900, 250, SDL_Color{ 255, 255, 255, 255 }, "Delay");
+	sprintf(buffer, "%.2f", (float)patternParameter.tech / 100);
+	nfont[FONT_REGULAR].draw(window, 900, 250, SDL_Color{ 255, 255, 255, 255 }, "Chord\nTech");
 	nfont[FONT_REGULAR].draw(window, 900, 350, SDL_Color{ 255, 255, 255, 255 }, buffer);
 	nfont[FONT_REGULAR].draw(window, 950, 400, SDL_Color{ 255, 255, 255, 255 }, "*");
 	nfont[FONT_REGULAR].draw(window, 200 + difficultySelect * 100, 400, SDL_Color{ 255, 255, 255, 255 }, ">");
 }
 
+void Graphic::drawHp(int hp) {
+	if (hp > 500) {
+		unsigned char newColor = (unsigned char)(255 - ((float)1000 - hp) / 500 * 255);
+		GPU_RectangleFilled(window, 0, 40, (float)hp / 5, 60, SDL_Color{ 255, 255, newColor, 255 });
+	}
+	else {
+		unsigned char newColor = (unsigned char)(255 - ((float)500 - hp) / 500 * 255);
+		GPU_RectangleFilled(window, 0, 40, (float)hp / 5, 60, SDL_Color{ 255, newColor, 0, 255 });
+	}
+}
+
+void Graphic::drawResult(Score& score) {
+	char scoreCount[32];
+	sprintf(scoreCount, "ScoreV1: %.6f", score.getScoreV1Seg());
+	nfont[FONT_REGULAR].draw(window, 50, 100, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "ScoreV2: %.6f", score.getScoreV2Seg());
+	nfont[FONT_REGULAR].draw(window, 50, 150, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+
+	sprintf(scoreCount, "%d", score.judgeCounterSeg[0]);
+	nfont[FONT_REGULAR].draw(window, 50, 200, SDL_Color{ 0, 255, 255, 255 }, "MARVELOUS:");
+	nfont[FONT_REGULAR].draw(window, 300, 200, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounterSeg[1]);
+	nfont[FONT_REGULAR].draw(window, 50, 250, SDL_Color{ 255, 255, 0, 255 }, "PERFECT:");
+	nfont[FONT_REGULAR].draw(window, 300, 250, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounterSeg[2]);
+	nfont[FONT_REGULAR].draw(window, 50, 300, SDL_Color{ 0, 255, 0, 255 }, "GREAT:");
+	nfont[FONT_REGULAR].draw(window, 300, 300, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounterSeg[3]);
+	nfont[FONT_REGULAR].draw(window, 50, 350, SDL_Color{ 0, 0, 255, 255 }, "GOOD:");
+	nfont[FONT_REGULAR].draw(window, 300, 350, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounterSeg[4]);
+	nfont[FONT_REGULAR].draw(window, 50, 400, SDL_Color{ 255, 0, 255, 255 }, "BAD:");
+	nfont[FONT_REGULAR].draw(window, 300, 400, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounterSeg[5]);
+	nfont[FONT_REGULAR].draw(window, 50, 450, SDL_Color{ 255, 0, 0, 255 }, "MISS:");
+	nfont[FONT_REGULAR].draw(window, 300, 450, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounterSeg[6]);
+	nfont[FONT_REGULAR].draw(window, 50, 500, SDL_Color{ 255, 0, 0, 255 }, "EARLY MISS:");
+	nfont[FONT_REGULAR].draw(window, 300, 500, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+
+	sprintf(scoreCount, "%.2f ms", score.getAvgErrorSeg());
+	nfont[FONT_REGULAR].draw(window, 50, 550, SDL_Color{ 255, 255, 255, 255 }, "Avg. Error:");
+	nfont[FONT_REGULAR].draw(window, 300, 550, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%.2f", score.getVarianceSeg());
+	nfont[FONT_REGULAR].draw(window, 50, 600, SDL_Color{ 255, 255, 255, 255 }, "Var.:");
+	nfont[FONT_REGULAR].draw(window, 300, 600, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%.2f ms", score.getSDSeg());
+	nfont[FONT_REGULAR].draw(window, 50, 650, SDL_Color{ 255, 255, 255, 255 }, "SD.:");
+	nfont[FONT_REGULAR].draw(window, 300, 650, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+}
+
+void Graphic::drawDanResult(Score& score, int danSeg) {
+	char scoreCount[32];
+	sprintf(scoreCount, "Segment: %d", danSeg + 1);
+	nfont[FONT_REGULAR].draw(window, 650, 50, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "ScoreV1: %.6f", score.getScoreV1());
+	nfont[FONT_REGULAR].draw(window, 650, 100, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "ScoreV2: %.6f", score.getScoreV2());
+	nfont[FONT_REGULAR].draw(window, 650, 150, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+
+	sprintf(scoreCount, "%d", score.judgeCounter[0]);
+	nfont[FONT_REGULAR].draw(window, 650, 200, SDL_Color{ 0, 255, 255, 255 }, "MARVELOUS:");
+	nfont[FONT_REGULAR].draw(window, 900, 200, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounter[1]);
+	nfont[FONT_REGULAR].draw(window, 650, 250, SDL_Color{ 255, 255, 0, 255 }, "PERFECT:");
+	nfont[FONT_REGULAR].draw(window, 900, 250, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounter[2]);
+	nfont[FONT_REGULAR].draw(window, 650, 300, SDL_Color{ 0, 255, 0, 255 }, "GREAT:");
+	nfont[FONT_REGULAR].draw(window, 900, 300, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounter[3]);
+	nfont[FONT_REGULAR].draw(window, 650, 350, SDL_Color{ 0, 0, 255, 255 }, "GOOD:");
+	nfont[FONT_REGULAR].draw(window, 900, 350, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounter[4]);
+	nfont[FONT_REGULAR].draw(window, 650, 400, SDL_Color{ 255, 0, 255, 255 }, "BAD:");
+	nfont[FONT_REGULAR].draw(window, 900, 400, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounter[5]);
+	nfont[FONT_REGULAR].draw(window, 650, 450, SDL_Color{ 255, 0, 0, 255 }, "MISS:");
+	nfont[FONT_REGULAR].draw(window, 900, 450, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%d", score.judgeCounter[6]);
+	nfont[FONT_REGULAR].draw(window, 650, 500, SDL_Color{ 255, 0, 0, 255 }, "EARLY MISS:");
+	nfont[FONT_REGULAR].draw(window, 900, 500, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+
+	sprintf(scoreCount, "%.2f ms", score.getAvgError());
+	nfont[FONT_REGULAR].draw(window, 650, 550, SDL_Color{ 255, 255, 255, 255 }, "Avg. Error:");
+	nfont[FONT_REGULAR].draw(window, 900, 550, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%.2f", score.getVariance());
+	nfont[FONT_REGULAR].draw(window, 650, 600, SDL_Color{ 255, 255, 255, 255 }, "Var.:");
+	nfont[FONT_REGULAR].draw(window, 900, 600, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+	sprintf(scoreCount, "%.2f ms", score.getSD());
+	nfont[FONT_REGULAR].draw(window, 650, 650, SDL_Color{ 255, 255, 255, 255 }, "SD.:");
+	nfont[FONT_REGULAR].draw(window, 900, 650, SDL_Color{ 255, 255, 255, 255 }, scoreCount);
+}
+
 void Graphic::drawDebug(char* debugText[]) {
 	for (int index = 0; debugText[index]; index++) {
-		nfont[FONT_DEBUG].draw(window, 10, index * 40, SDL_Color{ 255, 255, 255, 255 }, debugText[index]);
+		nfont[FONT_DEBUG].draw(window, 10, index * 40 + 100, SDL_Color{ 255, 255, 255, 255 }, debugText[index]);
 	}
 }
